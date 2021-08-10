@@ -8,13 +8,13 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
-            Father.hasMany(models["Students"], {
+            Father.hasMany(models["Student"], {
                 foreignKey: "FatherNationalId"
             })
-            Father.belongsTo(models["FatherAcademicDegree"], {
+            Father.belongsTo(models["AcademicDegree"], {
                 foreignKey: "FatherAcademicDegreeId",
             });
-            Father.belongsTo(models["JobId"], {
+            Father.belongsTo(models["Job"], {
                 foreignKey: "FatherJobId",
             });
         }
@@ -31,9 +31,9 @@ module.exports = (sequelize, DataTypes) => {
         FatherName: {
             type: DataTypes.STRING,
             allowNull: false,
-            validate: {
-                isAlpha: true
-            }
+            // validate: {
+            //     isAlpha: true
+            // }
         },
         FatherAddress: {
             type: DataTypes.STRING,
@@ -59,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
+        updatedAt: false,
         createdAt: false,
         modelName: 'Father',
         freezeTableName: true,

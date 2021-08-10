@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
+        updatedAt: false,
         createdAt: false,
         modelName: 'District',
         freezeTableName: true,

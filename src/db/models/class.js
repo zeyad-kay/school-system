@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
             Class.hasOne(models["Student"], {
-                foreignKey: "ClassId"
+                foreignKey: "StudentClassId"
             });
         }
     };
@@ -38,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
+        updatedAt: false,
         createdAt: false,
         modelName: 'Class',
         freezeTableName: true,

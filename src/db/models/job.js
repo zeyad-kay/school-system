@@ -29,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
         sequelize,
+        updatedAt: false,
         createdAt: false,
         modelName: 'Job',
         freezeTableName: true,

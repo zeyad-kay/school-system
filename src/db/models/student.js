@@ -40,9 +40,6 @@ module.exports = (sequelize, DataTypes) => {
         StudentName: {
             type: DataTypes.STRING,
             allowNull: false,
-            validate: {
-                isAlpha: true
-            }
         },
         StudentBirthDate: {
             type: DataTypes.DATEONLY,
@@ -63,11 +60,13 @@ module.exports = (sequelize, DataTypes) => {
         StudentSex: {
             type: DataTypes.ENUM,
             values: ["MALE", "FEMALE"],
+            defaultValue: "MALE",
             allowNull: false
         },
         StudentReligion: {
             type: DataTypes.ENUM,
             values: ["MUSLIM", "JEW", "CHRISTIAN"],
+            defaultValue: "MUSLIM",
             allowNull: false
         },
         // NOT IMPLEMENTED!!!
@@ -125,6 +124,7 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {
         sequelize,
+        updatedAt: false,
         createdAt: false,
         modelName: 'Student',
         freezeTableName: true
