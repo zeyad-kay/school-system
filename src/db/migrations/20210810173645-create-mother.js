@@ -12,9 +12,6 @@ module.exports = {
       MotherName: {
         type: Sequelize.STRING,
         allowNull: false,
-        validate: {
-          isAlpha: true
-        }
       },
       MotherAddress: {
         type: Sequelize.STRING,

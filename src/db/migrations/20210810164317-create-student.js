@@ -12,9 +12,6 @@ module.exports = {
       StudentName: {
         type: Sequelize.STRING,
         allowNull: false,
-        validate: {
-          isAlpha: true
-        }
       },
       StudentBirthDate: {
         type: Sequelize.DATEONLY,
@@ -35,11 +32,13 @@ module.exports = {
       StudentSex: {
         type: Sequelize.ENUM,
         values: ["MALE", "FEMALE"],
+        defaultValue: "MALE",
         allowNull: false
       },
       StudentReligion: {
         type: Sequelize.ENUM,
         values: ["MUSLIM", "JEW", "CHRISTIAN"],
+        defaultValue: "MUSLIM",
         allowNull: false
       },
       StudentRegisterDate: {
@@ -67,7 +66,7 @@ module.exports = {
           len: [14, 14]
         }
       },
-      ClassId: {
+      StudentClassId: {
         type: Sequelize.INTEGER,
         allowNull: false
       },

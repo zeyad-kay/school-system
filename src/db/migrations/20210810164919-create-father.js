@@ -12,10 +12,7 @@ module.exports = {
       FatherName: {
         type: Sequelize.STRING,
         allowNull: false,
-        validate: {
-          isAlpha: true
-        }
-      },
+        },
       FatherAddress: {
         type: Sequelize.STRING,
         allowNull: false
