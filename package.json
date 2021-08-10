@@ -10,8 +10,9 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "prepare": "husky install",
-    "db:migrate":"sequelize-cli db:migrate",
-    "db:seed":"sequelize-cli db:seed:all"
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:migrate:generate":"sequelize-cli migration:generate --name"
   },
   "keywords": [],
   "author": "zeyad",
@@ -46,6 +47,7 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "electron-squirrel-startup": "^1.0.0",
+    "pg": "^8.7.1",
     "sequelize": "^6.6.5",
     "sequelize-cli": "^6.2.0"
   },
@@ -63,6 +65,6 @@
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix",
-    "*.{css,md}": "prettier --write"
+    "*.{html,css,md}": "prettier --write"
   }
 }

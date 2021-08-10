@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        GradeName: {
+        GradeNumber: {
             type: DataTypes.INTEGER,
             validate: {
                 min: 1,
