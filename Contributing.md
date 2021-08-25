@@ -39,7 +39,7 @@ Useful commit messages that describe what you have been working on are greatly a
 
 ## Developing
 
-Make sure you update the credentials in the _/src/db/config/db.js_ with yours.
+Make sure you update the credentials in the _/src/db/config/db.js_ with yours in a _.env_ file.
 
 1. Install dependencies.
 
