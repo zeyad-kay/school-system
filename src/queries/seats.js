@@ -4,28 +4,7 @@ const { mapToJSON } = require("./utlis");
 const generateStudentSeats = async (gradeId, start, step) => {
   return db.sequelize.transaction(async (t) => {
         
-    const { count, students } = await db["Student"].findAndCountAll({
-      attributes: ["StudentId"],
-      include: {
-        attributes: [],
-        model: db["StudentClass"],
-        include: {
-          attributes: [],
-          model: db["Class"],
-          where: {
-            GradeId: gradeId
-          },
-          required: true
-        },
-        required: true
-      },
-      order: [
-        ["StudentName", "ASC"]
-      ],
-      required: true
-    }).then(res => {
-      return { students: mapToJSON(res.rows), count: res.count };
-    });
+    const { count, students } = studentsInGrade(gradeId);
 
     let seats = [];
     for (let i = 0; i < count; i++) {
@@ -37,6 +16,31 @@ const generateStudentSeats = async (gradeId, start, step) => {
         
     return db["StudentSeat"].bulkCreate(seats, { transaction: t })
       .then(mapToJSON);
+  });
+};
+
+const studentsInGrade = (gradeId) => {
+  return db["Student"].findAndCountAll({
+    attributes: ["StudentId"],
+    include: {
+      attributes: [],
+      model: db["StudentClass"],
+      include: {
+        attributes: [],
+        model: db["Class"],
+        where: {
+          GradeId: gradeId
+        },
+        required: true
+      },
+      required: true
+    },
+    order: [
+      ["StudentName", "ASC"]
+    ],
+    required: true
+  }).then(res => {
+    return { students: mapToJSON(res.rows), count: res.count };
   });
 };
 
