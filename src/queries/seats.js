@@ -4,7 +4,7 @@ const { mapToJSON } = require("./utlis");
 const generateStudentSeats = async (gradeId, start, step) => {
   return db.sequelize.transaction(async (t) => {
         
-    const { count, students } = studentsInGrade(gradeId);
+    const { count, students } = await studentsInGrade(gradeId);
 
     let seats = [];
     for (let i = 0; i < count; i++) {
