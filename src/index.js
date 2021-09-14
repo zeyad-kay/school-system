@@ -6,7 +6,7 @@ const db = require("../src/db/models/index");
 const { mapToJSON } = require("../src/queries/utlis");
 
 // Enable live reload for Electron too
-require("electron-reload")(__dirname);
+// require("electron-reload")(__dirname);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) { // eslint-disable-line global-require
@@ -122,12 +122,11 @@ ipcMain.on("sendStudentIdToMain", (err, studentId) => {
   };
   getStudentData(Number(studentId)).then(data => {
     mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
-    mainWindow.webContents.on("did-finish-load", () => {
+    mainWindow.webContents.on("did-finish-load", function cb() {
       mainWindow.webContents.send("getStudentDataFromMain", data);
-      mainWindow.webContents.removeListener("did-finish-load", () => {});
       counts++;
       console.log(counts);
+      mainWindow.webContents.removeListener("did-finish-load", cb);
     });
   });
-  mainWindow.webContents.removeListener("sendStudentIdToMain", () => {});
 });
