@@ -270,6 +270,7 @@
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
+                id="StudentName"
               />
             </div>
           </div>
@@ -283,6 +284,7 @@
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
+                id="StudentNationalId"
               />
             </div>
           </div>
@@ -297,6 +299,7 @@
               class="form-control"
               aria-label="Sizing example input"
               aria-describedby="inputGroup-sizing-sm"
+              id="StudentPassportId"
             />
           </div>
         </div>
@@ -312,6 +315,7 @@
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
+                id="StudentBirthDate"
               />
             </div>
           </div>
@@ -341,26 +345,30 @@
               class="form-control"
               aria-label="Sizing example input"
               aria-describedby="inputGroup-sizing-sm"
+              id="StudentAddress"
             />
           </div>
         </div>
 
         <div class="row my-3" dir="rtl">
           <div class="col-6 mb-2">
-            <select class="form-select" aria-label="Default select example">
+            <select
+              class="form-select"
+              aria-label="Default select example"
+              id="StudentSex"
+            >
               <option selected>النوع</option>
-              <option value="1">ذكر</option>
-              <option value="2">انثي</option>
+              <option value="MALE">ذكر</option>
+              <option value="FEMALE">انثي</option>
             </select>
           </div>
 
           <div class="col-6 mb-2">
-            <select class="form-select" aria-label="Default select example">
-              <option selected>الجنسيه</option>
-              <option value="1">مصر</option>
-              <option value="2">سوريا</option>
-              <option value="2">اليمن</option>
-            </select>
+            <select
+              class="form-select"
+              aria-label="Default select example"
+              id="StudentNationalities"
+            ></select>
           </div>
         </div>
 
@@ -375,16 +383,9 @@
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
+                id="StudentSiblingOrder"
               />
             </div>
-          </div>
-          <div class="col-md-6 col-12">
-            <select class="form-select" aria-label="Default select example">
-              <option selected>ولي الامر</option>
-              <option value="1">الاب</option>
-              <option value="2">الام</option>
-              <option value="3">غير</option>
-            </select>
           </div>
         </div>
         <div class="row my-3" dir="rtl">
@@ -397,18 +398,23 @@
               class="form-control"
               aria-label="Sizing example input"
               aria-describedby="inputGroup-sizing-sm"
+              id="StudentHealth"
             />
           </div>
         </div>
         <div class="row mb-2" dir="rtl">
           <div class="col">
-            <select class="form-select" aria-label="Default select example">
+            <select
+              class="form-select"
+              aria-label="Default select example"
+              id="StudentFamilyStatus"
+            >
               <option selected>الحاله العائليه</option>
-              <option value="1">يتيم</option>
-              <option value="2">متزوج</option>
-              <option value="3">مطلق</option>
-              <option value="4">الاب متوفي</option>
-              <option value="5">اﻻم متوفيه</option>
+              <option value="ORPHAN">يتيم</option>
+              <option value="MARRIED">متزوج</option>
+              <option value="DIVORCED">مطلق</option>
+              <option value="DEAD MOTHER">الاب متوفي</option>
+              <option value="DEAD FATHER">اﻻم متوفيه</option>
             </select>
           </div>
         </div>
@@ -419,11 +425,12 @@
               class="form-select"
               onchange="showPrimary(this)"
               aria-label="Default select example"
+              id="StageList"
             >
-              <option selected>المرحله الدراسيه</option>
+              <!-- <option selected>المرحله الدراسيه</option>
               <option value="1">ابتدائى</option>
               <option value="2">اعدادي</option>
-              <option value="3">ثانوي</option>
+              <option value="3">ثانوي</option> -->
             </select>
           </div>
           <div class="col-md-4 col-12">
@@ -431,14 +438,15 @@
               class="form-select"
               id="slct2"
               aria-label="Default select example"
+              id="GradeList"
             >
-              <option selected>السنه</option>
+              <!-- <option selected>السنه</option>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
               <option value="4" hidden id="value4">4</option>
               <option value="5" hidden id="value5">5</option>
-              <option value="6" hidden id="value6">6</option>
+              <option value="6" hidden id="value6">6</option> -->
             </select>
           </div>
           <div class="col-md-4 col-12">
@@ -446,11 +454,12 @@
               class="form-select"
               id="slct3"
               aria-label="Default select example"
+              id="ClassList"
             >
-              <option selected>الفصل</option>
+              <!-- <option selected>الفصل</option>
               <option value="1">1</option>
               <option value="2">2</option>
-              <option value="3">3</option>
+              <option value="3">3</option> -->
             </select>
           </div>
         </div>
@@ -1079,7 +1088,36 @@
         </div>
       </section>
     </main>
-
+    <script>
+      window.api.receive("getStudentDataFromMain", (data) => {
+        document
+          .getElementById("StudentName")
+          .setAttribute("value", data.StudentName);
+        document
+          .getElementById("StudentNationalId")
+          .setAttribute("value", data.StudentNationalId);
+        document
+          .getElementById("StudentPassportId")
+          .setAttribute("value", data.StudentPassportId);
+        document
+          .getElementById("StudentBirthDate")
+          .setAttribute("value", data.StudentBirthDate);
+        document
+          .getElementById("StudentAddress")
+          .setAttribute("value", data.StudentAddress);
+        document.getElementById("StudentSex").value = data.StudentSex;
+        let nationalities = document.getElementById("StudentNationalities");
+        for (let i = nationalities.length - 1; i >= 0; i--) {
+          nationalities.remove(i);
+        }
+        data.nationalities.forEach((el) => {
+          const option = document.createElement("option");
+          option.setAttribute("value", el.NationalityId);
+          option.innerText = el.NationalityName;
+          nationalities.appendChild(option);
+        });
+      });
+    </script>
     <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
     <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="./js/main.js"></script>
