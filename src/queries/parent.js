@@ -1,6 +1,42 @@
 const db = require("../db/models/index");
 const { Op } = require("sequelize");
-
+const { mapToJSON } = require("./utlis");
+//get ParentById 
+const getParentById = async (ParentId) => {
+  //get parent data 
+  let parentData = await db["Parent"].findOne({
+    where: {
+      ParentId
+    }
+  });
+  parentData = parentData.dataValues;
+  //get parent phones 
+  let parentPhones = await db["ParentPhone"].findAll({
+    attributes: ["ParentPhoneNumber"],
+    where: {
+      ParentId
+    }
+  });
+  parentPhones = mapToJSON(parentPhones).map(el => el.ParentPhoneNumber);
+  let parentJobs = await db["Job"].findAll({
+    attributes: ["JobName"],
+    include: {
+      model: db["ParentJob"],
+      attributes: ["ParentJobId", "ParentJobAddress"],
+      where: {
+        ParentId
+      }
+    }
+  });
+  parentJobs = mapToJSON(parentJobs).map(el => {
+    return { JobName: el.JobName, JobId : el.ParentJobs[0].ParentJobId,JobAddress: el.ParentJobs[0].ParentJobAddress};
+  });
+  return {
+    ...parentData,
+    phones: parentPhones,
+    jobs: parentJobs
+  };
+};
 // add new parent function
 const addParent = async (parentData) => {
   return db.sequelize.transaction(async (t) => {
@@ -15,10 +51,10 @@ const addParent = async (parentData) => {
         ]
       }
     });
-  
+
     if (!parent) {
       parent = await db["Parent"].create(parentData, { transaction: t });
-  
+
       // add parent phones
       if (parentData.phones.length != 0) {
 
@@ -27,13 +63,13 @@ const addParent = async (parentData) => {
         await Promise.all(parentData.phones.map(async (phone) => {
           return parent.createParentPhone({
             ParentPhoneNumber: phone
-          }, { transaction: t }).then(res=>res.toJSON().ParentPhoneNumber);
+          }, { transaction: t }).then(res => res.toJSON().ParentPhoneNumber);
         }));
 
       } else {
         throw new Error("Must specify at least one phone!");
       }
-    
+
       // add parent job
       if (parentData.ParentJobId) {
         parent.createParentJob({
@@ -49,5 +85,6 @@ const addParent = async (parentData) => {
 };
 
 module.exports = {
-  addParent
+  addParent,
+  getParentById
 };
