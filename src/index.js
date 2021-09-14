@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const student = require("./queries/students");
 const parent = require("./queries/parent");
+const db = require("../src/db/models/index");
+const { mapToJSON } = require("../src/queries/utlis");
 
 // Enable live reload for Electron too
 require("electron-reload")(__dirname);
@@ -55,59 +57,77 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-
-ipcMain.on("login", function(event, args) {
-  console.log(args[0],args[1]);
+let counts = 0;
+ipcMain.on("login", function (event, args) {
+  console.log(args[0], args[1]);
   // load Students 
   switch (args[0]) {
   case "1":
-    if (args[1] === "1234"){
+    if (args[1] === "1234") {
       mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
     }
     break;
   case "2":
-    if (args[1] === "2468"){
+    if (args[1] === "2468") {
       mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
-    } else 
-      break;  
+    } else
+      break;
   }
 });
-
-ipcMain.on("sendStudentIdToMain",(err,studentId) => {
+ipcMain.on("sendStudentIdToMain", (err, studentId) => {
   // load screen
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   const getStudentData = async (Id) => {
-    let studentData = await student.getStudentsByColumnMultipleVals("StudentId",[Id]);
+    let studentData = await student.getStudentsByColumnMultipleVals("StudentId", [Id]);
     studentData = studentData[0];
-    let fatherData = null; 
-    let motherData = null; 
-    let resData = null; 
+    let fatherData = null;
+    let motherData = null;
+    let resData = null;
+    // get nationalty 
+    let nationalities = await db["Nationality"].findAll();
+    let nationality = await db["Nationality"].findOne({
+      where: {
+        NationalityId: studentData.StudentNationalityId
+      }
+    });
+    nationality = nationality.dataValues;
+    nationalities = mapToJSON(nationalities);
     // get fatherData 
     let StudentFatherId = studentData.StudentFatherId;
-    if(StudentFatherId) {
+    if (StudentFatherId) {
       fatherData = parent.getParentById(StudentFatherId);
     }
     // get fatherData 
     let StudentMotherId = studentData.StudentMotherId;
-    if(StudentMotherId) {
+    if (StudentMotherId) {
       motherData = parent.getParentById(StudentMotherId);
     }
     // resp data 
     let StudentResponsibleId = studentData.StudentResponsibleId;
-    if(StudentResponsibleId) {
+    if (StudentResponsibleId) {
       resData = parent.getParentById(StudentResponsibleId);
     }
+    // 
     let data = {
       ...studentData,
+      nationality,
+      nationalities,
       ...fatherData,
       ...motherData,
       ...resData
     };
     // get absent data 
+    console.log("here");
     return data;
   };
   getStudentData(Number(studentId)).then(data => {
     mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
-    mainWindow.webContents.send("getStudentDataFromMain",data);
+    mainWindow.webContents.on("did-finish-load", () => {
+      mainWindow.webContents.send("getStudentDataFromMain", data);
+      mainWindow.webContents.removeListener("did-finish-load", () => {});
+      counts++;
+      console.log(counts);
+    });
   });
+  mainWindow.webContents.removeListener("sendStudentIdToMain", () => {});
 });
