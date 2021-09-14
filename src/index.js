@@ -1,13 +1,10 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
-const Sequelize = require("sequelize");
-const db = require("./config/db");
-const sequelize = new Sequelize(db["development"]);
-const Student = require("./db/models/student")(sequelize, Sequelize.DataTypes);
-const electron = require('electron');
+const student = require("./queries/students");
+const parent = require("./queries/parent");
 
 // Enable live reload for Electron too
-require('electron-reload')(__dirname);
+require("electron-reload")(__dirname);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) { // eslint-disable-line global-require
@@ -20,6 +17,9 @@ const createWindow = () => {
     width: 1920,
     height: 1080,
     webPreferences: {
+      nodeIntegration: false, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
+      enableRemoteModule: false, // turn off remote
       preload: path.join(__dirname, "views/js/preload.js")
     }
   });
@@ -57,7 +57,8 @@ app.on("activate", () => {
 // code. You can also put them in separate files and import them here.
 
 ipcMain.on("login", function(event, args) {
-  console.log(args);
+  console.log(args[0],args[1]);
+  // load Students 
   switch (args[0]) {
   case "1":
     if (args[1] === "1234"){
@@ -66,10 +67,47 @@ ipcMain.on("login", function(event, args) {
     break;
   case "2":
     if (args[1] === "2468"){
-      mainWindow.loadFile(path.join(__dirname, "views/student-affairs.html"));
-      Student.findAll()
-        .then(res => res.map((r)=>r.toJSON())).then(console.log).catch(err => console.error(err));
+      mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
     } else 
       break;  
   }
+});
+
+ipcMain.on("sendStudentIdToMain",(err,studentId) => {
+  // load screen
+  mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+  const getStudentData = async (Id) => {
+    let studentData = await student.getStudentsByColumnMultipleVals("StudentId",[Id]);
+    studentData = studentData[0];
+    let fatherData = null; 
+    let motherData = null; 
+    let resData = null; 
+    // get fatherData 
+    let StudentFatherId = studentData.StudentFatherId;
+    if(StudentFatherId) {
+      fatherData = parent.getParentById(StudentFatherId);
+    }
+    // get fatherData 
+    let StudentMotherId = studentData.StudentMotherId;
+    if(StudentMotherId) {
+      motherData = parent.getParentById(StudentMotherId);
+    }
+    // resp data 
+    let StudentResponsibleId = studentData.StudentResponsibleId;
+    if(StudentResponsibleId) {
+      resData = parent.getParentById(StudentResponsibleId);
+    }
+    let data = {
+      ...studentData,
+      ...fatherData,
+      ...motherData,
+      ...resData
+    };
+    // get absent data 
+    return data;
+  };
+  getStudentData(Number(studentId)).then(data => {
+    mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
+    mainWindow.webContents.send("getStudentDataFromMain",data);
+  });
 });

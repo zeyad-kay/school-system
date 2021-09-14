@@ -3,16 +3,31 @@ const db = require("../db/models/index");
 const parent = require("./parent");
 
 const { mapToJSON } = require("./utlis");
+
+
 // eslint-disable-next-line no-unused-vars
 const getAllStudents = () => {
-  return db["Student"].findAll().then(mapToJSON);
-};
-// eslint-disable-next-line no-unused-vars
-const getStudentsByColumnOneVal = (column, val) => {
-  return db["Student"].findAll({
-    where: {
-      [column]: {
-        [Op.like]: `%${val}%`,
+  return db["Stage"].findAll({
+    attributes: ["StageId", "StageName"],
+    required: true,
+    include: {
+      model: db["Grade"],
+      attributes: ["GradeId", "GradeName"],
+      required: true,
+      include: {
+        model: db["Class"],
+        attributes: ["ClassId"],
+        required: true,
+        include: {
+          model: db["StudentClass"],
+          attributes: ["StudentId"],
+          required: true,
+          include: {
+            model: db["Student"],
+            attributes: ["StudentName"],
+            required: true
+          }
+        }
       }
     }
   }).then(mapToJSON);
@@ -235,19 +250,21 @@ const upgradeStudentsToNextGrade = async () => {
     // adde new 2 classes at first grade
     let firstStageId = Stages[Stages.length - 1];
     let Grades = await db["Grade"].findAll({
-      attributes:["GradeId"],
-      where : {
-        StageId : firstStageId
+      attributes: ["GradeId"],
+      where: {
+        StageId: firstStageId
       }
     });
     Grades = Grades.map(g => g.dataValues.GradeId).sort();
     let firstGradeId = Grades[0];
-    await db["Class"].bulkCreate([{GradeId : firstGradeId},{GradeId : firstGradeId}],{transaction:t});
+    await db["Class"].bulkCreate([{ GradeId: firstGradeId }, { GradeId: firstGradeId }], { transaction: t });
     return "Students have been upgraded";
   });
 };
 module.exports = {
+  getAllStudents,
   addNewStudent,
   updateStudentByStudentId,
-  upgradeStudentsToNextGrade
+  upgradeStudentsToNextGrade,
+  getStudentsByColumnMultipleVals
 };
