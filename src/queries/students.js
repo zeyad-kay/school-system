@@ -9,23 +9,18 @@ const { mapToJSON } = require("./utlis");
 const getAllStudents = () => {
   return db["Stage"].findAll({
     attributes: ["StageId", "StageName"],
-    required: true,
     include: {
       model: db["Grade"],
       attributes: ["GradeId", "GradeName"],
-      required: true,
       include: {
         model: db["Class"],
         attributes: ["ClassId"],
-        required: true,
         include: {
           model: db["StudentClass"],
           attributes: ["StudentId"],
-          required: true,
           include: {
             model: db["Student"],
-            attributes: ["StudentName"],
-            required: true
+            attributes: ["StudentName"]
           }
         }
       }

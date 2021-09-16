@@ -6,7 +6,9 @@ const db = require("../src/db/models/index");
 const { mapToJSON } = require("../src/queries/utlis");
 
 // Enable live reload for Electron too
-// require("electron-reload")(__dirname);
+require("electron-reload")(__dirname, {
+  electron: require("../node_modules/electron")
+});
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) { // eslint-disable-line global-require
@@ -57,7 +59,6 @@ app.on("activate", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-let counts = 0;
 ipcMain.on("login", function (event, args) {
   console.log(args[0], args[1]);
   // load Students 
@@ -95,38 +96,83 @@ ipcMain.on("sendStudentIdToMain", (err, studentId) => {
     // get fatherData 
     let StudentFatherId = studentData.StudentFatherId;
     if (StudentFatherId) {
-      fatherData = parent.getParentById(StudentFatherId);
+      fatherData = await parent.getParentById(StudentFatherId);
     }
     // get fatherData 
     let StudentMotherId = studentData.StudentMotherId;
     if (StudentMotherId) {
-      motherData = parent.getParentById(StudentMotherId);
+      motherData = await parent.getParentById(StudentMotherId);
     }
     // resp data 
     let StudentResponsibleId = studentData.StudentResponsibleId;
     if (StudentResponsibleId) {
-      resData = parent.getParentById(StudentResponsibleId);
+      resData = await parent.getParentById(StudentResponsibleId);
     }
-    // 
+    // get all stages , grades and classes
+    let stagesData = await db["Stage"].findAll({
+      attributes: ["StageId", "StageName"],
+      include: {
+        model: db["Grade"],
+        attributes: ["GradeId", "GradeName"],
+        include: {
+          model: db["Class"],
+          attributes: ["ClassId"]
+        }
+      }
+    });
+    stagesData = mapToJSON(stagesData);
+    // get class of the student 
+    let ClassId = await db["StudentClass"].findOne({
+      attributes: ["ClassId"],
+      where: {
+        StudentId: Id,
+      }
+    });
+    ClassId = ClassId.ClassId;
+    let GradeId = await db["Class"].findOne({
+      attributes: ["GradeId"],
+      where: {
+        ClassId
+      }
+    });
+    GradeId = GradeId.GradeId;
+    let StageId = await db["Grade"].findOne({
+      attributes: ["StageId"],
+      where: {
+        GradeId
+      }
+    });
+    StageId = StageId.StageId;
+    let studentClass = {
+      StageId,
+      GradeId,
+      ClassId
+    };
+    //get all jobs 
+    let jobs = await db["Job"].findAll();
+    jobs = mapToJSON(jobs);
+    // get resData
+    // console.log(resData);
     let data = {
       ...studentData,
       nationality,
       nationalities,
-      ...fatherData,
-      ...motherData,
-      ...resData
+      fatherData,
+      motherData,
+      resData,
+      stagesData,
+      studentClass,
+      jobs
     };
     // get absent data 
-    console.log("here");
     return data;
   };
   getStudentData(Number(studentId)).then(data => {
+    // console.log(data);
     mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
-    mainWindow.webContents.on("did-finish-load", function cb() {
+    ipcMain.on("ScriptLoaded", function cb() {
       mainWindow.webContents.send("getStudentDataFromMain", data);
-      counts++;
-      console.log(counts);
-      mainWindow.webContents.removeListener("did-finish-load", cb);
+      ipcMain.removeListener("ScriptLoaded", cb);
     });
   });
 });

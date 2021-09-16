@@ -15,6 +15,7 @@
     />
     <title>شؤون الطلاب</title>
   </head>
+
   <body>
     <!--start of navbar-->
     <nav class="navbar navbar-expand-lg fixed-top navbar-dark" dir="rtl">
@@ -280,7 +281,7 @@
                 >الرقم القومي :</span
               >
               <input
-                type="number"
+                type="text"
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
@@ -295,7 +296,7 @@
               >رقم الباسبورت:</span
             >
             <input
-              type="number"
+              type="text"
               class="form-control"
               aria-label="Sizing example input"
               aria-describedby="inputGroup-sizing-sm"
@@ -423,44 +424,28 @@
           <div class="col-md-4 col-12">
             <select
               class="form-select"
-              onchange="showPrimary(this)"
+              onchange=""
               aria-label="Default select example"
               id="StageList"
             >
-              <!-- <option selected>المرحله الدراسيه</option>
-              <option value="1">ابتدائى</option>
-              <option value="2">اعدادي</option>
-              <option value="3">ثانوي</option> -->
+              <option selected>المرحله الدراسيه</option>
             </select>
           </div>
           <div class="col-md-4 col-12">
             <select
               class="form-select"
-              id="slct2"
+              disabled
               aria-label="Default select example"
               id="GradeList"
-            >
-              <!-- <option selected>السنه</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4" hidden id="value4">4</option>
-              <option value="5" hidden id="value5">5</option>
-              <option value="6" hidden id="value6">6</option> -->
-            </select>
+            ></select>
           </div>
           <div class="col-md-4 col-12">
             <select
               class="form-select"
-              id="slct3"
+              disabled
               aria-label="Default select example"
               id="ClassList"
-            >
-              <!-- <option selected>الفصل</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option> -->
-            </select>
+            ></select>
           </div>
         </div>
       </section>
@@ -478,6 +463,7 @@
           <div class="form-check form-switch">
             <input
               class="form-check-input"
+              id="DeadDadTrigger"
               onchange="hideDadData()"
               type="checkbox"
               id="flexSwitchCheckDefault"
@@ -496,6 +482,7 @@
                   >الاسم :</span
                 >
                 <input
+                  id="DadName"
                   type="text"
                   class="form-control"
                   aria-label="Sizing example input"
@@ -509,7 +496,8 @@
                   >الرقم القومي :</span
                 >
                 <input
-                  type="number"
+                  type="text"
+                  id="DadNationalId"
                   class="form-control"
                   aria-label="Sizing example input"
                   aria-describedby="inputGroup-sizing-sm"
@@ -523,7 +511,8 @@
                 >رقم الباسبورت:</span
               >
               <input
-                type="number"
+                type="text"
+                id="DadPassportId"
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
@@ -538,6 +527,7 @@
               >
               <input
                 type="text"
+                id="DadAddress"
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
@@ -548,70 +538,24 @@
           <div class="row my-3" dir="rtl">
             <div class="col-12">
               <div class="input-group input-group mb-2 col-md-6 col-12">
-                <select class="form-select" aria-label="Default select example">
+                <select
+                  id="DadAcademicDegree"
+                  class="form-select"
+                  aria-label="Default select example"
+                >
                   <option selected>شهاده الاب</option>
-                  <option value="1">بكالريوس</option>
-                  <option value="2">دكتوراه</option>
-                  <option value="3">ماجيستير</option>
-                  <option value="4">ثانويه</option>
+                  <option value="BACHELOR">بكالريوس</option>
+                  <option value="PHD">دكتوراه</option>
+                  <option value="MASTERS">ماجيستير</option>
+                  <option value="SECONDARY">ثانويه</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <div class="row my-3" dir="rtl">
-            <div class="col-12 col-md-4">
-              <select class="form-select" aria-label="Default select example">
-                <option selected>عمل الاب</option>
-                <option value="1">يعمل بالمدرسه</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
-            </div>
-            <div class="col-12 col-md-4">
-              <div class="input-group input-group mb-2 col">
-                <span class="input-group-text" id="inputGroup-sizing"
-                  >عنوان العمل :</span
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-sm"
-                />
-              </div>
-            </div>
-            <div class="col-12 col-md-4">
-              <button class="btn btn-primary" onclick="addWork()">
-                اضافه عمل
-              </button>
-            </div>
-          </div>
-          <div id="work"></div>
+          <div id="DadworkArea"></div>
 
-          <div class="row my-3" dir="rtl">
-            <div class="col-md-8 col-12">
-              <div class="input-group input-group mb-2 col-md-6 col-12">
-                <span class="input-group-text" id="inputGroup-sizing"
-                  >رقم الهاتف :</span
-                >
-                <input
-                  type="number"
-                  id="phone"
-                  class="form-control"
-                  aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-sm"
-                />
-              </div>
-            </div>
-            <div class="col-md-2 col-6">
-              <button class="btn btn-primary" onclick="addPhone()">
-                اضافه رقم اخر
-              </button>
-            </div>
-          </div>
-
-          <div id="dadphone" class="my-3"></div>
+          <div id="dadphoneArea" class="my-3"></div>
         </div>
       </section>
 
@@ -630,7 +574,7 @@
               class="form-check-input"
               onchange="hideMumData()"
               type="checkbox"
-              id="flexSwitchCheckDefault"
+              id="DeadMomTrigger"
             />
             <label class="form-check-label h5" for="flexSwitchCheckDefault"
               >متوفيه</label
@@ -647,6 +591,7 @@
                 >
                 <input
                   type="text"
+                  id="MomName"
                   class="form-control"
                   aria-label="Sizing example input"
                   aria-describedby="inputGroup-sizing-sm"
@@ -659,8 +604,9 @@
                   >الرقم القومي :</span
                 >
                 <input
-                  type="number"
+                  type="text"
                   class="form-control"
+                  id="MomNationalId"
                   aria-label="Sizing example input"
                   aria-describedby="inputGroup-sizing-sm"
                 />
@@ -674,8 +620,9 @@
                 >رقم الباسبورت:</span
               >
               <input
-                type="number"
+                type="text"
                 class="form-control"
+                id="MomPassportId"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
               />
@@ -690,6 +637,7 @@
               <input
                 type="text"
                 class="form-control"
+                id="MomAddress"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
               />
@@ -699,70 +647,62 @@
           <div class="row my-3" dir="rtl">
             <div class="col-12">
               <div class="input-group input-group mb-2 col-12">
-                <select class="form-select" aria-label="Default select example">
+                <select
+                  class="form-select"
+                  id="MomAcademicDegree"
+                  aria-label="Default select example"
+                >
                   <option selected>شهاده الام</option>
-                  <option value="1">بكالريوس</option>
-                  <option value="2">دكتوراه</option>
-                  <option value="3">ماجيستير</option>
-                  <option value="4">ثانويه</option>
+                  <option value="BACHELOR">بكالريوس</option>
+                  <option value="PHD">دكتوراه</option>
+                  <option value="MASTERS">ماجيستير</option>
+                  <option value="SECONDARY">ثانويه</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <div class="row my-3" dir="rtl">
-            <div class="col-12 col-md-4">
-              <select class="form-select" aria-label="Default select example">
-                <option selected>عمل اﻻم</option>
-                <option value="1">يعمل بالمدرسه</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
-            </div>
-            <div class="col-12 col-md-4">
-              <div class="input-group input-group mb-2 col">
-                <span class="input-group-text" id="inputGroup-sizing"
-                  >عنوان العمل :</span
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-sm"
-                />
-              </div>
-            </div>
-            <div class="col-12 col-md-4">
-              <button class="btn btn-primary" onclick="addWork2()">
-                اضافه عمل
-              </button>
+          <!-- <div class="row my-3" dir="rtl">
+          <div class="col-12 col-md-4">
+            <select class="form-select" aria-label="Default select example">
+              <option selected>عمل اﻻم</option>
+              <option value="1">يعمل بالمدرسه</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="input-group input-group mb-2 col">
+              <span class="input-group-text" id="inputGroup-sizing">عنوان العمل :</span>
+              <input type="text" class="form-control" aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-sm" />
             </div>
           </div>
+          <div class="col-12 col-md-4">
+            <button class="btn btn-primary" onclick="addWork2()">
+              اضافه عمل
+            </button>
+          </div>
+        </div> -->
 
-          <div id="work2"></div>
+          <div id="MomWorkArea"></div>
 
-          <div class="row my-3" id="num" dir="rtl">
-            <div class="col-md-8 col-12">
-              <div class="input-group input-group mb-2 col-md-6 col-12">
-                <span class="input-group-text" id="inputGroup-sizing"
-                  >رقم الهاتف :</span
-                >
-                <input
-                  type="number"
-                  class="form-control"
-                  aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-sm"
-                />
-              </div>
-            </div>
-            <div class="col-md-2 col-6">
-              <button class="btn btn-primary" onclick="add_mum_Phone()">
-                اضافه رقم اخر
-              </button>
+          <!-- <div class="row my-3" id="num" dir="rtl">
+          <div class="col-md-8 col-12">
+            <div class="input-group input-group mb-2 col-md-6 col-12">
+              <span class="input-group-text" id="inputGroup-sizing">رقم الهاتف :</span>
+              <input type="number" class="form-control" aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-sm" />
             </div>
           </div>
+          <div class="col-md-2 col-6">
+            <button class="btn btn-primary" onclick="add_mum_Phone()">
+              اضافه رقم اخر
+            </button>
+          </div>
+        </div> -->
 
-          <div id="mum-phone" class="my-3"></div>
+          <div id="MomPhoneArea" class="my-3"></div>
         </div>
       </section>
 
@@ -828,38 +768,55 @@
         <h1 class="text-center py-4">بيانات ولي اﻻمر</h1>
         <div class="row">
           <select
+            id="StudentResponsibleRelationSelect"
             class="form-select"
             aria-label="Default select example"
             onchange="showCareTaker('other',this)"
           >
-            <option selected value="1">الاب</option>
-            <option value="2">اﻻم</option>
-            <option value="3">غير</option>
+            <option value="father">الاب</option>
+            <option value="mother">اﻻم</option>
+            <option value="other">غير</option>
           </select>
         </div>
 
         <div id="other" class="my-5" hidden>
           <div class="row my-3" dir="rtl">
-            <div class="col-md-6 col-12">
+            <div class="col-md-4 col-12">
               <div class="input-group input-group mb-2 col-md-6 col-12">
                 <span class="input-group-text" id="inputGroup-sizing"
-                  >الاسم :</span
+                  >صلة القرابة :</span
                 >
                 <input
                   type="text"
+                  id="StudentResponsibleRelation"
                   class="form-control"
                   aria-label="Sizing example input"
                   aria-describedby="inputGroup-sizing-sm"
                 />
               </div>
             </div>
-            <div class="col-md-6 col-12">
+            <div class="col-md-4 col-12">
+              <div class="input-group input-group mb-2 col-md-6 col-12">
+                <span class="input-group-text" id="inputGroup-sizing"
+                  >الاسم :</span
+                >
+                <input
+                  type="text"
+                  id="ResName"
+                  class="form-control"
+                  aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-sm"
+                />
+              </div>
+            </div>
+            <div class="col-md-4 col-12">
               <div class="input-group input-group mb-2 col-md-6 col-12">
                 <span class="input-group-text" id="inputGroup-sizing"
                   >الرقم القومي :</span
                 >
                 <input
-                  type="number"
+                  type="text"
+                  id="ResNationalId"
                   class="form-control"
                   aria-label="Sizing example input"
                   aria-describedby="inputGroup-sizing-sm"
@@ -874,81 +831,86 @@
                 >رقم الباسبورت:</span
               >
               <input
-                type="number"
+                type="text"
+                id="ResPassportId"
                 class="form-control"
                 aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm"
               />
             </div>
           </div>
-
+          <div class="row my-3" dir="rtl">
+            <div class="input-group input-group mb-2 col">
+              <span class="input-group-text" id="inputGroup-sizing"
+                >العنوان بالكامل :</span
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="ResAddress"
+                aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-sm"
+              />
+            </div>
+          </div>
           <div class="row my-3" dir="rtl">
             <div class="col-12">
               <div class="input-group input-group mb-2 col-12">
-                <select class="form-select" aria-label="Default select example">
+                <select
+                  id="ResAcademicDegree"
+                  class="form-select"
+                  aria-label="Default select example"
+                >
                   <option selected>شهاده ولي اﻻمر</option>
-                  <option value="1">بكالريوس</option>
-                  <option value="2">دكتوراه</option>
-                  <option value="3">ماجيستير</option>
-                  <option value="4">ثانويه</option>
+                  <option value="BACHELOR">بكالريوس</option>
+                  <option value="PHD">دكتوراه</option>
+                  <option value="MASTERS">ماجيستير</option>
+                  <option value="SECONDARY">ثانويه</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <div class="row my-3" dir="rtl">
-            <div class="col-12 col-md-4">
-              <select class="form-select" aria-label="Default select example">
-                <option selected>عمل ولي اﻻمر</option>
-                <option value="1">يعمل بالمدرسه</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
-            </div>
-            <div class="col-12 col-md-4">
-              <div class="input-group input-group mb-2 col">
-                <span class="input-group-text" id="inputGroup-sizing"
-                  >عنوان العمل :</span
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-sm"
-                />
-              </div>
-            </div>
-            <div class="col-12 col-md-4">
-              <button class="btn btn-primary w-75" onclick="addWork3()">
-                اضافه عمل
-              </button>
+          <!-- <div class="row my-3" dir="rtl">
+          <div class="col-12 col-md-4">
+            <select class="form-select" aria-label="Default select example">
+              <option selected>عمل ولي اﻻمر</option>
+              <option value="1">يعمل بالمدرسه</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="input-group input-group mb-2 col">
+              <span class="input-group-text" id="inputGroup-sizing">عنوان العمل :</span>
+              <input type="text" class="form-control" aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-sm" />
             </div>
           </div>
-
-          <div id="work3"></div>
-
-          <div class="row my-3" id="num" dir="rtl">
-            <div class="col-md-8 col-12">
-              <div class="input-group input-group mb-2 col-md-6 col-12">
-                <span class="input-group-text" id="inputGroup-sizing"
-                  >رقم الهاتف :</span
-                >
-                <input
-                  type="number"
-                  class="form-control"
-                  aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-sm"
-                />
-              </div>
-            </div>
-            <div class="col-md-2 col-6">
-              <button class="btn btn-primary" onclick="add_CT_Phone()">
-                اضافه رقم اخر
-              </button>
-            </div>
-
-            <div id="CT-phone" class="my-3"></div>
+          <div class="col-12 col-md-4">
+            <button class="btn btn-primary w-75" onclick="addWork3()">
+              اضافه عمل
+            </button>
           </div>
+        </div> -->
+
+          <div id="ResWorkArea"></div>
+
+          <!-- <div class="row my-3" id="num" dir="rtl">
+          <div class="col-md-8 col-12">
+            <div class="input-group input-group mb-2 col-md-6 col-12">
+              <span class="input-group-text" id="inputGroup-sizing">رقم الهاتف :</span>
+              <input type="number" class="form-control" aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-sm" />
+            </div>
+          </div>
+          <div class="col-md-2 col-6">
+            <button class="btn btn-primary" onclick="add_CT_Phone()">
+              اضافه رقم اخر
+            </button>
+          </div> -->
+
+          <div id="ResPhoneArea" class="my-3"></div>
         </div>
       </section>
 
@@ -1093,30 +1055,452 @@
         document
           .getElementById("StudentName")
           .setAttribute("value", data.StudentName);
-        document
-          .getElementById("StudentNationalId")
-          .setAttribute("value", data.StudentNationalId);
-        document
-          .getElementById("StudentPassportId")
-          .setAttribute("value", data.StudentPassportId);
+        if (data.StudentNationalId)
+          document
+            .getElementById("StudentNationalId")
+            .setAttribute("value", data.StudentNationalId);
+        if (data.StudentPassportId)
+          document
+            .getElementById("StudentPassportId")
+            .setAttribute("value", data.StudentPassportId);
         document
           .getElementById("StudentBirthDate")
           .setAttribute("value", data.StudentBirthDate);
         document
           .getElementById("StudentAddress")
           .setAttribute("value", data.StudentAddress);
+        document
+          .getElementById("StudentSiblingOrder")
+          .setAttribute("value", data.StudentSiblingOrder);
+        if (data.StudentHealth == null) {
+          document.getElementById("StudentHealth").setAttribute("value", "");
+        } else {
+          document
+            .getElementById("StudentHealth")
+            .setAttribute("value", data.StudentHealth);
+        }
+        document.getElementById("StudentFamilyStatus").value =
+          data.StudentFamilyStatus;
         document.getElementById("StudentSex").value = data.StudentSex;
         let nationalities = document.getElementById("StudentNationalities");
-        for (let i = nationalities.length - 1; i >= 0; i--) {
-          nationalities.remove(i);
-        }
         data.nationalities.forEach((el) => {
           const option = document.createElement("option");
           option.setAttribute("value", el.NationalityId);
           option.innerText = el.NationalityName;
+          if (el.NationalityId == data.nationality.NationalityId) {
+            option.setAttribute("selected", "true");
+          }
           nationalities.appendChild(option);
         });
+        // stages
+        const StageList = document.getElementById("StageList");
+        const GradeList = document.getElementById("GradeList");
+        const ClassList = document.getElementById("ClassList");
+        //console.log(StageList);
+        data.stagesData.forEach((stage) => {
+          const option = document.createElement("option");
+          option.setAttribute("value", stage.StageId);
+          option.innerText = stage.StageName;
+          StageList.appendChild(option);
+        });
+
+        StageList.addEventListener("change", function () {
+          let StageId = this.value;
+          data.stagesData.forEach((stage) => {
+            if (stage.StageId == StageId) {
+              // remover all elements in grade list
+              const GradeList = document.getElementById("GradeList");
+              for (let i = GradeList.length - 1; i >= 0; i--) {
+                GradeList.remove(i);
+              }
+              const header = document.createElement("option");
+              header.selected = true;
+              header.innerText = "السنة الدراسية";
+              GradeList.appendChild(header);
+              // fill Grades
+              let Grades = stage.Grades;
+              Grades.forEach((grade) => {
+                const option = document.createElement("option");
+                option.setAttribute("value", grade.GradeId);
+                option.innerText = grade.GradeName;
+                GradeList.appendChild(option);
+              });
+              GradeList.disabled = false;
+            }
+          });
+        });
+
+        GradeList.addEventListener("change", function (ev) {
+          let StageId = document.getElementById("StageList").value;
+          let GradeId = this.value;
+          data.stagesData.forEach((stage) => {
+            if (stage.StageId == StageId) {
+              stage.Grades.forEach((grade) => {
+                if (grade.GradeId == GradeId) {
+                  // remover all elements in class list
+                  const ClassList = document.getElementById("ClassList");
+                  for (let i = GradeList.length - 1; i >= 0; i--) {
+                    ClassList.remove(i);
+                  }
+                  // fill Grades
+                  let Classes = grade.Classes;
+                  let counts = 1;
+                  Classes.forEach((clas) => {
+                    const option = document.createElement("option");
+                    option.setAttribute("value", clas.ClassId);
+                    option.innerText = "الفصل " + clas.ClassId;
+                    counts++;
+                    ClassList.appendChild(option);
+                  });
+                  ClassList.disabled = false;
+                }
+              });
+            }
+          });
+        });
+        // get class of the student
+        StageList.value = data.studentClass.StageId;
+        StageList.dispatchEvent(new Event("change"));
+        GradeList.value = data.studentClass.GradeId;
+        GradeList.dispatchEvent(new Event("change"));
+        ClassList.value = data.studentClass.ClassId;
+        // fill father data
+        let fatherData = data.fatherData;
+        let motherData = data.motherData;
+        let resData = data.resData;
+        if (!fatherData) {
+          //dead
+          const DeadDadTrigger = document.getElementById("DeadDadTrigger");
+          DeadDadTrigger.checked = true;
+          DeadDadTrigger.dispatchEvent(new Event("change"));
+        } else {
+          document
+            .getElementById("DadName")
+            .setAttribute("value", fatherData.ParentName);
+          if (fatherData.ParentNationalId)
+            document
+              .getElementById("DadNationalId")
+              .setAttribute("value", fatherData.ParentNationalId);
+          if (fatherData.ParentPassportId)
+            document
+              .getElementById("DadPassportId")
+              .setAttribute("value", fatherData.ParentPassportId);
+          document
+            .getElementById("DadAddress")
+            .setAttribute("value", fatherData.ParentAddress);
+          document.getElementById("DadAcademicDegree").value =
+            fatherData.ParentAcademicDegree;
+          // hundle job data
+          let dadJobs = fatherData.jobs;
+          const dadJobArea = document.getElementById("DadworkArea");
+          dadJobs.forEach((job) => {
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.classList.add("row", "my-3");
+            wrapperDiv.setAttribute("dir", "rtl");
+            const dadWorkTitle = document.createElement("div");
+            dadWorkTitle.classList.add("col-12", "col-md-4");
+            const dadWorkSelect = document.createElement("select");
+            dadWorkSelect.classList.add("form-select");
+            dadWorkSelect.setAttribute("id", "dad-work-title" + job.JobId);
+            dadWorkSelect.setAttribute("aria-label", "Default select example");
+            data.jobs.forEach((j) => {
+              const option = document.createElement("option");
+              option.value = j.JobId;
+              option.innerText = j.JobName;
+              if (j.JobId === job.JobId) {
+                option.selected = true;
+              }
+              dadWorkSelect.appendChild(option);
+            });
+            dadWorkTitle.appendChild(dadWorkSelect);
+            wrapperDiv.appendChild(dadWorkTitle);
+            const dadWorkAdress = document.createElement("div");
+            dadWorkAdress.classList.add("col-12", "col-md-4");
+            const dadWorkAdressInner = document.createElement("div");
+            dadWorkAdressInner.classList.add(
+              "input-group",
+              "input-group",
+              "mb-2",
+              "col"
+            );
+            const dadWorkAdressInnerLabel = document.createElement("span");
+            dadWorkAdressInnerLabel.classList.add("input-group-text");
+            dadWorkAdressInnerLabel.innerText = "عنوان العمل :";
+            dadWorkAdressInner.appendChild(dadWorkAdressInnerLabel);
+            const dadWorkAdressInnerInput = document.createElement("input");
+            dadWorkAdressInnerInput.value = job.JobAddress;
+            dadWorkAdressInnerInput.classList.add("form-control");
+            dadWorkAdressInnerInput.setAttribute("type", "text");
+            dadWorkAdressInnerInput.setAttribute(
+              "id",
+              "dad-work-place-" + job.JobId
+            );
+            dadWorkAdressInner.appendChild(dadWorkAdressInnerInput);
+            dadWorkAdress.appendChild(dadWorkAdressInner);
+            wrapperDiv.appendChild(dadWorkAdress);
+            dadJobArea.appendChild(wrapperDiv);
+          });
+          // hundle dad phones
+          const dadPhoneArea = document.getElementById("dadphoneArea");
+          let counts = 1;
+          data.fatherData.phones.forEach((phone) => {
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.classList.add("row", "my-3");
+            wrapperDiv.setAttribute("dir", "rtl");
+            const dadPhoneHead = document.createElement("div");
+            dadPhoneHead.classList.add("col-md-8", "col-12");
+            const dadPhoneHeadInner = document.createElement("div");
+            dadPhoneHeadInner.classList.add(
+              "input-group",
+              "input-group",
+              "mb-2",
+              "col-md-6",
+              "col-12"
+            );
+            const dadPhoneHeadInnerLabel = document.createElement("span");
+            dadPhoneHeadInnerLabel.classList.add("input-group-text");
+            dadPhoneHeadInnerLabel.innerText = "رقم الهاتف :";
+            dadPhoneHeadInner.appendChild(dadPhoneHeadInnerLabel);
+            const dadPhoneHeadInnerInput = document.createElement("input");
+            dadPhoneHeadInnerInput.classList.add("form-control");
+            dadPhoneHeadInnerInput.setAttribute("type", "text");
+            dadPhoneHeadInnerInput.setAttribute("id", "dad-phone-" + counts);
+            dadPhoneHeadInnerInput.value = phone;
+            dadPhoneHeadInner.appendChild(dadPhoneHeadInnerInput);
+            dadPhoneHead.appendChild(dadPhoneHeadInner);
+            wrapperDiv.appendChild(dadPhoneHead);
+            dadPhoneArea.appendChild(wrapperDiv);
+            counts++;
+          });
+        }
+        if (!motherData) {
+          //dead
+          const DeadMomTrigger = document.getElementById("DeadMomTrigger");
+          DeadMomTrigger.checked = true;
+          DeadMomTrigger.dispatchEvent(new Event("change"));
+        } else {
+          document
+            .getElementById("MomName")
+            .setAttribute("value", motherData.ParentName);
+          if (motherData.ParentNationalId)
+            document
+              .getElementById("MomNationalId")
+              .setAttribute("value", motherData.ParentNationalId);
+          if (motherData.ParentPassportId)
+            document
+              .getElementById("MomPassportId")
+              .setAttribute("value", motherData.ParentPassportId);
+          document
+            .getElementById("MomAddress")
+            .setAttribute("value", motherData.ParentAddress);
+          document.getElementById("MomAcademicDegree").value =
+            motherData.ParentAcademicDegree;
+          // hundle mom job
+          let momJobs = motherData.jobs;
+          const dadJobArea = document.getElementById("MomWorkArea");
+          momJobs.forEach((job) => {
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.classList.add("row", "my-3");
+            wrapperDiv.setAttribute("dir", "rtl");
+            const dadWorkTitle = document.createElement("div");
+            dadWorkTitle.classList.add("col-12", "col-md-4");
+            const dadWorkSelect = document.createElement("select");
+            dadWorkSelect.classList.add("form-select");
+            dadWorkSelect.setAttribute("id", "dad-work-title" + job.JobId);
+            dadWorkSelect.setAttribute("aria-label", "Default select example");
+            data.jobs.forEach((j) => {
+              const option = document.createElement("option");
+              option.value = j.JobId;
+              option.innerText = j.JobName;
+              if (j.JobId === job.JobId) {
+                option.selected = true;
+              }
+              dadWorkSelect.appendChild(option);
+            });
+            dadWorkTitle.appendChild(dadWorkSelect);
+            wrapperDiv.appendChild(dadWorkTitle);
+            const dadWorkAdress = document.createElement("div");
+            dadWorkAdress.classList.add("col-12", "col-md-4");
+            const dadWorkAdressInner = document.createElement("div");
+            dadWorkAdressInner.classList.add(
+              "input-group",
+              "input-group",
+              "mb-2",
+              "col"
+            );
+            const dadWorkAdressInnerLabel = document.createElement("span");
+            dadWorkAdressInnerLabel.classList.add("input-group-text");
+            dadWorkAdressInnerLabel.innerText = "عنوان العمل :";
+            dadWorkAdressInner.appendChild(dadWorkAdressInnerLabel);
+            const dadWorkAdressInnerInput = document.createElement("input");
+            dadWorkAdressInnerInput.value = job.JobAddress;
+            dadWorkAdressInnerInput.classList.add("form-control");
+            dadWorkAdressInnerInput.setAttribute("type", "text");
+            dadWorkAdressInnerInput.setAttribute(
+              "id",
+              "dad-work-place-" + job.JobId
+            );
+            dadWorkAdressInner.appendChild(dadWorkAdressInnerInput);
+            dadWorkAdress.appendChild(dadWorkAdressInner);
+            wrapperDiv.appendChild(dadWorkAdress);
+            dadJobArea.appendChild(wrapperDiv);
+          });
+          // hundle moms phone
+          const MomPhoneArea = document.getElementById("MomPhoneArea");
+          let counts = 1;
+          data.motherData.phones.forEach((phone) => {
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.classList.add("row", "my-3");
+            wrapperDiv.setAttribute("dir", "rtl");
+            const dadPhoneHead = document.createElement("div");
+            dadPhoneHead.classList.add("col-md-8", "col-12");
+            const dadPhoneHeadInner = document.createElement("div");
+            dadPhoneHeadInner.classList.add(
+              "input-group",
+              "input-group",
+              "mb-2",
+              "col-md-6",
+              "col-12"
+            );
+            const dadPhoneHeadInnerLabel = document.createElement("span");
+            dadPhoneHeadInnerLabel.classList.add("input-group-text");
+            dadPhoneHeadInnerLabel.innerText = "رقم الهاتف :";
+            dadPhoneHeadInner.appendChild(dadPhoneHeadInnerLabel);
+            const dadPhoneHeadInnerInput = document.createElement("input");
+            dadPhoneHeadInnerInput.classList.add("form-control");
+            dadPhoneHeadInnerInput.setAttribute("type", "text");
+            dadPhoneHeadInnerInput.setAttribute("id", "dad-phone-" + counts);
+            dadPhoneHeadInnerInput.value = phone;
+            dadPhoneHeadInner.appendChild(dadPhoneHeadInnerInput);
+            dadPhoneHead.appendChild(dadPhoneHeadInner);
+            wrapperDiv.appendChild(dadPhoneHead);
+            MomPhoneArea.appendChild(wrapperDiv);
+            counts++;
+          });
+        }
+
+        // hundle res data
+        if (fatherData && resData.ParentId === fatherData.ParentId) {
+          // res is dad
+          const StudentResponsibleRelationSelect = document.getElementById(
+            "StudentResponsibleRelationSelect"
+          );
+          StudentResponsibleRelationSelect.value = "father";
+          StudentResponsibleRelationSelect.dispatchEvent(new Event("change"));
+        } else if (motherData && resData.ParentId === motherData.ParentId) {
+          const StudentResponsibleRelationSelect = document.getElementById(
+            "StudentResponsibleRelationSelect"
+          );
+          StudentResponsibleRelationSelect.value = "mother";
+          StudentResponsibleRelationSelect.dispatchEvent(new Event("change"));
+        } else {
+          const StudentResponsibleRelationSelect = document.getElementById(
+            "StudentResponsibleRelationSelect"
+          );
+          StudentResponsibleRelationSelect.value = "other";
+          StudentResponsibleRelationSelect.dispatchEvent(new Event("change"));
+          document
+            .getElementById("ResName")
+            .setAttribute("value", resData.ParentName);
+          if (resData.ParentNationalId)
+            document
+              .getElementById("ResNationalId")
+              .setAttribute("value", resData.ParentNationalId);
+          if (resData.ParentPassportId)
+            document
+              .getElementById("ResPassportId")
+              .setAttribute("value", resData.ParentPassportId);
+          document
+            .getElementById("ResAddress")
+            .setAttribute("value", resData.ParentAddress);
+          document.getElementById("ResAcademicDegree").value =
+            resData.ParentAcademicDegree;
+          // hundle job data
+          let ResJobs = resData.jobs;
+          const ResJobArea = document.getElementById("ResJobArea");
+          ResJobs.forEach((job) => {
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.classList.add("row", "my-3");
+            wrapperDiv.setAttribute("dir", "rtl");
+            const dadWorkTitle = document.createElement("div");
+            dadWorkTitle.classList.add("col-12", "col-md-4");
+            const dadWorkSelect = document.createElement("select");
+            dadWorkSelect.classList.add("form-select");
+            dadWorkSelect.setAttribute("id", "dad-work-title" + job.JobId);
+            dadWorkSelect.setAttribute("aria-label", "Default select example");
+            data.jobs.forEach((j) => {
+              const option = document.createElement("option");
+              option.value = j.JobId;
+              option.innerText = j.JobName;
+              if (j.JobId === job.JobId) {
+                option.selected = true;
+              }
+              dadWorkSelect.appendChild(option);
+            });
+            dadWorkTitle.appendChild(dadWorkSelect);
+            wrapperDiv.appendChild(dadWorkTitle);
+            const dadWorkAdress = document.createElement("div");
+            dadWorkAdress.classList.add("col-12", "col-md-4");
+            const dadWorkAdressInner = document.createElement("div");
+            dadWorkAdressInner.classList.add(
+              "input-group",
+              "input-group",
+              "mb-2",
+              "col"
+            );
+            const dadWorkAdressInnerLabel = document.createElement("span");
+            dadWorkAdressInnerLabel.classList.add("input-group-text");
+            dadWorkAdressInnerLabel.innerText = "عنوان العمل :";
+            dadWorkAdressInner.appendChild(dadWorkAdressInnerLabel);
+            const dadWorkAdressInnerInput = document.createElement("input");
+            dadWorkAdressInnerInput.value = job.JobAddress;
+            dadWorkAdressInnerInput.classList.add("form-control");
+            dadWorkAdressInnerInput.setAttribute("type", "text");
+            dadWorkAdressInnerInput.setAttribute(
+              "id",
+              "dad-work-place-" + job.JobId
+            );
+            dadWorkAdressInner.appendChild(dadWorkAdressInnerInput);
+            dadWorkAdress.appendChild(dadWorkAdressInner);
+            wrapperDiv.appendChild(dadWorkAdress);
+            ResJobArea.appendChild(wrapperDiv);
+          });
+          // hundle dad phones
+          const resPhoneArea = document.getElementById("ResPhoneArea");
+          let counts = 1;
+          data.resData.phones.forEach((phone) => {
+            const wrapperDiv = document.createElement("div");
+            wrapperDiv.classList.add("row", "my-3");
+            wrapperDiv.setAttribute("dir", "rtl");
+            const dadPhoneHead = document.createElement("div");
+            dadPhoneHead.classList.add("col-md-8", "col-12");
+            const dadPhoneHeadInner = document.createElement("div");
+            dadPhoneHeadInner.classList.add(
+              "input-group",
+              "input-group",
+              "mb-2",
+              "col-md-6",
+              "col-12"
+            );
+            const dadPhoneHeadInnerLabel = document.createElement("span");
+            dadPhoneHeadInnerLabel.classList.add("input-group-text");
+            dadPhoneHeadInnerLabel.innerText = "رقم الهاتف :";
+            dadPhoneHeadInner.appendChild(dadPhoneHeadInnerLabel);
+            const dadPhoneHeadInnerInput = document.createElement("input");
+            dadPhoneHeadInnerInput.classList.add("form-control");
+            dadPhoneHeadInnerInput.setAttribute("type", "text");
+            dadPhoneHeadInnerInput.setAttribute("id", "dad-phone-" + counts);
+            dadPhoneHeadInnerInput.value = phone;
+            dadPhoneHeadInner.appendChild(dadPhoneHeadInnerInput);
+            dadPhoneHead.appendChild(dadPhoneHeadInner);
+            wrapperDiv.appendChild(dadPhoneHead);
+            resPhoneArea.appendChild(wrapperDiv);
+            counts++;
+          });
+        }
       });
+
+      window.api.send("ScriptLoaded", null);
     </script>
     <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
     <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>

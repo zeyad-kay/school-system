@@ -1,9 +1,10 @@
 const { contextBridge , ipcRenderer} = require("electron");
+// const student = require("../../queries/students");
 contextBridge.exposeInMainWorld(
   "api", {
     send: (channel, data) => {
       // whitelist channels
-      let validChannels = ["sendStudentIdToMain"];
+      let validChannels = ["sendStudentIdToMain","ScriptLoaded"];
       if (validChannels.includes(channel)) {
         ipcRenderer.send(channel, data);
       }
@@ -17,12 +18,13 @@ contextBridge.exposeInMainWorld(
     }
   }
 );
-const loadSideBar = () => {
+const loadSideBar = async () => {
   const pillsTab = document.getElementById("pills-tab");
   const pillsTabContent = document.getElementById("pills-tabContent");
   if (!pillsTab || !pillsTabContent) return;
   // const students = await getAllStudents()
-  const students = require("../../../data.json");
+  // const students = await student.getAllStudents();
+  const students = require("../../../data2.json");
   const stages = students.map(elem => {
     return { name: elem.StageName, id: elem.StageId, grades: elem.Grades };
   });
@@ -74,7 +76,6 @@ const loadSideBar = () => {
       gradeAccordionItemContent.setAttribute("aria-labelledby", gradeAccordionItemHeaderId);
       const gradeAccordionItemInnerContent = document.createElement("div");
       gradeAccordionItemInnerContent.classList.add("accordion-body", "text-center");
-      let counts = 1;
       grade.Classes.forEach(clas => {
         const classAccordion = document.createElement("div");
         classAccordion.classList.add("accordion", "accordion-flush");
@@ -91,7 +92,7 @@ const loadSideBar = () => {
         classAccordionItemHeaderButton.setAttribute("data-bs-toggle", "collapse");
         classAccordionItemHeaderButton.setAttribute("aria-expanded", "false");
         classAccordionItemHeaderButton.setAttribute("aria-controls", classAccordionItemHeaderId);
-        classAccordionItemHeaderButton.innerText = "class " + counts;
+        classAccordionItemHeaderButton.innerText = "class " + clas.ClassId;
         const classAccordionItemContent = document.createElement("div");
         classAccordionItemContent.classList.add("collapse", "accordion-collapse");
         classAccordionItemContent.setAttribute("id", classDataBsTarget);
