@@ -662,46 +662,7 @@
             </div>
           </div>
 
-          <!-- <div class="row my-3" dir="rtl">
-          <div class="col-12 col-md-4">
-            <select class="form-select" aria-label="Default select example">
-              <option selected>عمل اﻻم</option>
-              <option value="1">يعمل بالمدرسه</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </div>
-          <div class="col-12 col-md-4">
-            <div class="input-group input-group mb-2 col">
-              <span class="input-group-text" id="inputGroup-sizing">عنوان العمل :</span>
-              <input type="text" class="form-control" aria-label="Sizing example input"
-                aria-describedby="inputGroup-sizing-sm" />
-            </div>
-          </div>
-          <div class="col-12 col-md-4">
-            <button class="btn btn-primary" onclick="addWork2()">
-              اضافه عمل
-            </button>
-          </div>
-        </div> -->
-
           <div id="MomWorkArea"></div>
-
-          <!-- <div class="row my-3" id="num" dir="rtl">
-          <div class="col-md-8 col-12">
-            <div class="input-group input-group mb-2 col-md-6 col-12">
-              <span class="input-group-text" id="inputGroup-sizing">رقم الهاتف :</span>
-              <input type="number" class="form-control" aria-label="Sizing example input"
-                aria-describedby="inputGroup-sizing-sm" />
-            </div>
-          </div>
-          <div class="col-md-2 col-6">
-            <button class="btn btn-primary" onclick="add_mum_Phone()">
-              اضافه رقم اخر
-            </button>
-          </div>
-        </div> -->
-
           <div id="MomPhoneArea" class="my-3"></div>
         </div>
       </section>
@@ -771,7 +732,7 @@
             id="StudentResponsibleRelationSelect"
             class="form-select"
             aria-label="Default select example"
-            onchange="showCareTaker('other',this)"
+            onchange="showCareTakerData('other',this)"
           >
             <option value="father">الاب</option>
             <option value="mother">اﻻم</option>
@@ -1051,6 +1012,10 @@
       </section>
     </main>
     <script>
+      function showCareTakerData(divId, element) {
+        let caretaker = document.getElementById(divId);
+        caretaker.hidden = element.value == "other" ? false : true;
+      }
       window.api.receive("getStudentDataFromMain", (data) => {
         document
           .getElementById("StudentName")
