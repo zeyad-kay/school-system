@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../scss/Reports/Reports.css">
+    <link rel="stylesheet" href="../../../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+    <title> تقرير المسددين مرحل والباقى عليهم مرحل </title>
+</head>
+<body>
+        <!--start of navbar-->
+        <nav class="navbar navbar-expand-lg fixed-top navbar-dark" dir="rtl">
+            <div class="container-fluid">
+              <a class="navbar-brand mx-5" href="#" >معهد الوفاء</a>
+              <button class="navbar-toggler rounded-pill text-warning mx-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+                <i class="bi bi-arrow-right-circle"></i>
+              </button>
+              <button class="navbar-toggler mx-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <form class="d-flex  me-auto  mt-3 mt-md-0 ">
+                  <input class="text-center form-control mx-3 rounded-pill" type="search" placeholder="ابحث" aria-label="Search">
+                  <button class="btn btn-outline-warning rounded-circle" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+              </div>
+            </div>
+        </nav>
+        <!--end of navbar-->
+
+        <!--main content-->
+        <main dir="rtl" class="mx-5 my-5 pt-5">
+            <table id="table_id" class="display table-striped">
+                <h1 class="text-center py-2 border-bottom border-3 mb-5 border-dark"> تقرير المسددين مرحل والباقى عليهم مرحل</h1>
+                <thead>
+                    <tr>
+                        <th>Column 1</th>
+                        <th>Column 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Row 1 Data 1</td>
+                        <td>Row 1 Data 2</td>
+                    </tr>
+                    <tr>
+                        <td>Row 2 Data 1</td>
+                        <td>Row 2 Data 2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+
+        <script src="../../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
+        <script src="../../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="../../../node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="../../../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+        <script src="../js/main.js"></script>
+        <script>
+            $(document).ready( function () {
+                $('#table_id').DataTable({
+                    searching: true,
+                    ordering:  true,
+                });
+            } );
+        </script>
+</body>
+</html>
