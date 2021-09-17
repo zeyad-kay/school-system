@@ -6,17 +6,22 @@
   scroll-behavior: smooth;
 }
 
-.sidebar-nav {
-  width: 280px !important;
-  background-color: #161925;
-}
 
-.navbar {
-  background-color: #161925 !important;
+.dropdown-menu li {
+  position: relative;
 }
-
-.navbar .navbar-brand {
-  color: #fcf7f8;
+.dropdown-menu .dropdown-submenu {
+  display: none;
+  position: absolute;
+  right: 100%;
+  top: -7px;
+}
+.dropdown-menu .dropdown-submenu-left {
+  right: 100%;
+  left: auto;
+}
+.dropdown-menu > li:hover > .dropdown-submenu {
+  display: block;
 }
 
 .navbar .navbar-brand:hover {
