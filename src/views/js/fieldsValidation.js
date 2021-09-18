@@ -4,6 +4,7 @@ const checkStudentData = () => {
     let StudentNationalId = document.getElementById("StudentNationalId").value;
     let StudentPassportId = document.getElementById("StudentPassportId").value;
     let StudentBirthDate = document.getElementById("StudentBirthDate").value;
+    let StudentRegisterDate = document.getElementById("StudentRegisterDate").value;
     let StudentAddress = document.getElementById("StudentAddress").value;
     let StudentNationalityId = document.getElementById("StudentNationalities").value;
     let StudentSex = document.getElementById("StudentSex").value;
@@ -14,6 +15,7 @@ const checkStudentData = () => {
     // check length of all attrs 
     if (StudentName.length === 0 || StudentBirthDate.length === 0 || StudentAddress.length === 0 ||
         !StudentNationalityId || !StudentSex || !StudentSiblingOrder || !StudentFamilyStatus || !StudentClassId
+        || StudentRegisterDate.length === 0
     ) {
         errors.push("من فضلك ادخل جميع الحقول في بيانات الطالب");
     }
@@ -31,6 +33,7 @@ const checkStudentData = () => {
                     StudentNationalId,
                     StudentPassportId,
                     StudentBirthDate,
+                    StudentRegisterDate,
                     StudentAddress,
                     StudentNationalityId,
                     StudentSex,

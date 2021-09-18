@@ -141,16 +141,18 @@ const addNewStudent = async (fatherData, motherData, responsibleParentData, stud
     if (fatherData) {
       let father = await parent.addParent(fatherData, t);
       StudentFatherId = father.ParentId;
+      console.log("father");
     }
-    // check if there is a father 
+    // check if there is a mother 
     if (motherData) {
       let mother = await parent.addParent(motherData, t);
       StudentMotherId = mother.ParentId;
+      console.log("mother");
     }
-    if (responsibleParentData[0] == "father") {
+    if (responsibleParentData[0] === "father") {
       StudentResponsibleId = StudentFatherId;
       StudentResponsibleRelation = "father";
-    } else if (responsibleParentData[0] == "mother") {
+    } else if (responsibleParentData[0] === "mother") {
       StudentResponsibleId = StudentMotherId;
       StudentResponsibleRelation = "mother";
     } else {
@@ -227,10 +229,10 @@ const updateStudentByStudentId = async (StudentId, newFatherData, newMotherData,
     // check if ther ia new res data if  so update it 
     let StudentResponsibleRelation = "";
     if (newResponsibleParentData) {
-      if (newResponsibleParentData[0] == "father") {
+      if (newResponsibleParentData[0] === "father") {
         StudentResponsibleId = StudentFatherId;
         StudentResponsibleRelation = "father";
-      } else if (newResponsibleParentData[0] == "mother") {
+      } else if (newResponsibleParentData[0] === "mother") {
         StudentResponsibleId = StudentMotherId;
         StudentResponsibleRelation = "mother";
       } else {
