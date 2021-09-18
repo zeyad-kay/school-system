@@ -105,13 +105,10 @@
                 d-inline-block
                 rounded-pill
               "
+              type="button"
+              onclick='window.api.send("getEssentialData", "addStudent");'
             >
-              <a
-                class="text-decoration-none text-dark"
-                href="./addNewStudent.html"
-              >
-                تسجيل طالب جديد</a
-              >
+                تسجيل طالب جديد
             </button>
           </div>
         </div>
@@ -332,6 +329,7 @@
               class="form-control"
               aria-label="Sizing example input"
               required
+              id="StudentRegisterDate"
               aria-describedby="inputGroup-sizing-sm"
             />
           </div>
@@ -1155,6 +1153,9 @@
         document
           .getElementById("StudentBirthDate")
           .setAttribute("value", data.StudentBirthDate);
+          document
+          .getElementById("StudentRegisterDate")
+          .setAttribute("value", data.StudentRegisterDate);
         document
           .getElementById("StudentAddress")
           .setAttribute("value", data.StudentAddress);

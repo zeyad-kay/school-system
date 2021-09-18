@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const student = require("./queries/students");
+const db = require("./db/models/index");
+const { mapToJSON } = require("./queries/utlis");
 // Enable live reload for Electron too
 require("electron-reload")(__dirname, {
   electron: require("../node_modules/electron")
@@ -52,10 +54,66 @@ app.on("activate", () => {
     createWindow();
   }
 });
+const getEssentialData = async () => {
+  let stagesData = await db["Stage"].findAll({
+    attributes: ["StageId", "StageName"],
+    include: {
+      model: db["Grade"],
+      attributes: ["GradeId", "GradeName"],
+      include: {
+        model: db["Class"],
+        attributes: ["ClassId"]
+      }
+    }
+  });
+  stagesData = mapToJSON(stagesData);
+  //get all jobs 
+  let jobs = await db["Job"].findAll();
+  jobs = mapToJSON(jobs);
+  // get all nationalities
+  let nationalities = await db["Nationality"].findAll();
+  nationalities = mapToJSON(nationalities);
+  return {
+    stagesData,
+    jobs,
+    nationalities
+  };
+}
+// get essintial Data 
+ipcMain.on("getEssentialData", function (err, destination) {
+  mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+  // get all stages , grades and classes
+  getEssentialData().then(data => {
+    if (destination === "addStudent") {
+      mainWindow.loadFile(path.join(__dirname, "views/addNewStudent.html"));
+      ipcMain.on("ScriptLoaded", function cb() {
+        mainWindow.webContents.send("sentEssentialData", data);
+        ipcMain.removeListener("ScriptLoaded", cb);
+      });
+    }
+  });
 
+});
+ipcMain.on("addNewStudentRequest", (err, { studentData, fatherData, motherData, resData }) => {
+  mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+  student.addNewStudent(fatherData, motherData, resData, studentData.studentData,
+    studentData.StudentClassId).then(() => {
+      mainWindow.loadFile(path.join(__dirname, "views/addNewStudent.html"));
+      ipcMain.on("ScriptLoaded", function cb() {
+        mainWindow.webContents.send("feedBackMessages", "تم تسجيل الطالب بنجاح");
+        ipcMain.removeListener("ScriptLoaded", cb);
+      });
+    }).catch(err => {
+      console.log(err);
+      mainWindow.loadFile(path.join(__dirname, "views/addNewStudent.html"));
+      ipcMain.on("ScriptLoaded", function cb() {
+        mainWindow.webContents.send("feedBackMessages", " حدث خطأ اثناء الأدخال برجاء مراجعه البيانات وحاول مجددا");
+        ipcMain.removeListener("ScriptLoaded", cb);
+      });
+    });
+});
 // update student 
 ipcMain.on("UpdateStudentData", function (err, { studentId, studentData, fatherData, motherData, resData }) {
-  console.log(resData);
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   //update student
   student.updateStudentByStudentId(studentId, fatherData, motherData, resData, studentData.studentData,

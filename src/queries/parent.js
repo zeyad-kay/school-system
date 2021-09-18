@@ -115,7 +115,7 @@ const addParent = async (parentData,t) => {
     }
 
     // add parent job
-    parentData.ParentData.jobs.forEach(async (job) => {
+    parentData.jobs.forEach(async (job) => {
       await parent.createParentJob({
         ParentJobId: job.ParentJobId,
         ParentJobAddress: job.ParentJobAddress
