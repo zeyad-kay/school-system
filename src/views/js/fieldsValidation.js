@@ -274,3 +274,27 @@ const checkResData = () => {
         };
     }
 }
+
+//check absence data
+const checkAddAbsenceData = () => {
+    let errors = [];
+    const AbsentDate = document.getElementById("AbsentDate").value;
+    const AbsentReason = document.getElementById("AbsentReasons").value;
+    if(AbsentReason.length === 0 || AbsentDate.length === 0){
+        errors.push("من فضلك ادخل التاريخ وسبب الغياب لإضافه غياب جديد للطالب");
+    }
+    if(errors.length === 0) {
+        return {
+            errors : [],
+            data : {
+                AbsentReason,
+                AbsentDate
+            }
+        }
+    }else {
+        return {
+            errors,
+            data : {}
+        }
+    }
+}

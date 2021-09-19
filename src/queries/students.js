@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const db = require("../db/models/index");
 const parent = require("./parent");
+const absent = require("./absent");
 
 const { mapToJSON } = require("./utlis");
 
@@ -79,7 +80,9 @@ const getStudentData = async (Id) => {
   let jobs = await db["Job"].findAll();
   jobs = mapToJSON(jobs);
   // get resData
-  // console.log(resData);
+  // get absent data 
+  let absentReasons = await absent.getAllReasons();
+  let studentAbsent = await absent.getStudentAbsenceDays(Id);
   let data = {
     ...studentData,
     studentId : Id,
@@ -90,7 +93,9 @@ const getStudentData = async (Id) => {
     resData,
     stagesData,
     studentClass,
-    jobs
+    jobs,
+    absentReasons,
+    studentAbsent
   };
   // get absent data 
   return data;

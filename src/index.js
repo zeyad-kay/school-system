@@ -3,6 +3,7 @@ const path = require("path");
 const student = require("./queries/students");
 const db = require("./db/models/index");
 const { mapToJSON } = require("./queries/utlis");
+const absent = require("./queries/absent");
 // Enable live reload for Electron too
 require("electron-reload")(__dirname, {
   electron: require("../node_modules/electron")
@@ -121,6 +122,32 @@ ipcMain.on("addNewStudentRequest", (err, { studentData, fatherData, motherData, 
       });
     });
 });
+// add Student Absent
+ipcMain.on("addStudentAbsent", function (err, { studentId, AbsentDate, AbsentReason }) {
+  mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+  absent.addNewAbsenceDay(studentId, AbsentReason, AbsentDate).then(() => {
+    student.getStudentData(studentId).then(data => {
+      student.getAllStudents().then(students => {
+        data = {
+          ...data,
+          students
+        }
+        mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
+        ipcMain.on("ScriptLoaded", function cb() {
+          mainWindow.webContents.send("getStudentDataFromMain", data);
+          ipcMain.removeListener("ScriptLoaded", cb);
+        });
+      }).catch(console.log);
+    }).catch(console.log);
+  }).catch(console.log);
+});
+// update absent reason 
+ipcMain.on("updateStudentAbsent",(err,{studentId,absentDate,newReasonId}) => {
+  absent.updateAbsenceReason(studentId,absentDate,newReasonId).catch(console.log);
+});
+ipcMain.on("deleteStudentAbsent",(err,{studentId,absentDate}) => {
+  absent.deleteAbsence(studentId,absentDate).catch(console.log);
+})
 // update student 
 ipcMain.on("UpdateStudentData", function (err, { studentId, studentData, fatherData, motherData, resData }) {
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
@@ -131,7 +158,7 @@ ipcMain.on("UpdateStudentData", function (err, { studentId, studentData, fatherD
         student.getAllStudents().then(students => {
           data = {
             ...data,
-            students  
+            students
           }
           mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
           ipcMain.on("ScriptLoaded", function cb() {
@@ -175,7 +202,7 @@ ipcMain.on("sendStudentIdToMain", (err, studentId) => {
     student.getAllStudents().then(students => {
       data = {
         ...data,
-        students  
+        students
       }
       mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
       ipcMain.on("ScriptLoaded", function cb() {

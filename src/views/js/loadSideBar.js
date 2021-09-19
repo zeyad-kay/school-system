@@ -5,7 +5,7 @@ function loadSideBar(students) {
     const stages = students.map(elem => {
         return { name: elem.StageName, id: elem.StageId, grades: elem.Grades };
     });
-    stages.forEach(stage => {
+    stages.forEach((stage,i) => {
         const stageLi = document.createElement("li");
         stageLi.classList.add("nav-item");
         stageLi.setAttribute("role", "presentation");
@@ -19,12 +19,21 @@ function loadSideBar(students) {
         stageButton.setAttribute("type", "button");
         stageButton.setAttribute("role", "tab");
         stageButton.setAttribute("aria-controls", stageDataBsTarget);
-        stageButton.setAttribute("aria-selected", "false");
+        if(i === 0) {
+            stageButton.setAttribute("aria-selected", "true");
+            stageButton.classList.add("active");
+        }else {
+            stageButton.setAttribute("aria-selected", "true");
+        }
         stageButton.innerText = stage.name;
         stageLi.appendChild(stageButton);
         pillsTab.appendChild(stageLi);
         const stageDiv = document.createElement("div");
-        stageDiv.classList.add("tab-pane", "fade", "text-warning");
+        if(i === 0) {
+            stageDiv.classList.add("tab-pane", "fade","show", "active" ,"text-warning");
+        }else {
+            stageDiv.classList.add("tab-pane", "fade", "text-warning");
+        }
         stageDiv.setAttribute("id", stageDataBsTarget);
         stageDiv.setAttribute("role", "tabpanel");
         stageDiv.setAttribute("aria-labelledby", stageButtonId);
