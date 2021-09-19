@@ -58,9 +58,9 @@
                 my-2
                 d-inline-block
                 rounded-pill
-              ">
-            <a class="text-decoration-none text-dark" href="affairsHome.html">
-              الرئيسية</a>
+              
+                " onclick='window.api.send("getEssentialData", "affairsHome");'>
+            الرئيسية
           </button>
         </div>
       </div>
@@ -595,7 +595,8 @@
   });
   // get essintial data like all nationalities and all jobs parent   
   window.api.receive("sentEssentialData", (data) => {
-    jobs = data.jobs
+    loadSideBar(data.students);
+    jobs = data.jobs;
     addWorkToDiv('DadworkArea', 1, "", false);
     addWorkToDiv('MomWorkArea', 1, "", false);
     addWorkToDiv('ResWorkArea', 1, "", false);
@@ -677,8 +678,10 @@
   });
   window.api.send("ScriptLoaded", null);
 </script>
+<script src="../views/js/loadSideBar.js"></script>
 <script src="../views/js/fieldsValidation.js"></script>
 <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
 <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="./js/main.js"></script>
+
 </html>

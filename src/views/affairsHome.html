@@ -128,7 +128,13 @@
 
     <!--register section-->
     <main class="mt-5 pt-3 tab-content" id="register"></main>
-
+    <script>
+      window.api.receive("sentEssentialData",(students) => {
+        loadSideBar(students);
+      });
+      window.api.send("ScriptLoaded");
+    </script>
+    <script src="../views/js/loadSideBar.js"></script>
     <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
     <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="./js/main.js"></script>

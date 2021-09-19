@@ -89,13 +89,9 @@
                 d-inline-block
                 rounded-pill
               "
+              onclick='window.api.send("getEssentialData", "affairsHome");'
             >
-              <a
-                class="text-decoration-none text-dark"
-                href="./affairsHome.html"
-              >
-                الرئيسية</a
-              >
+                الرئيسية
             </button>
             <button
               class="
@@ -1132,6 +1128,7 @@
         caretaker.hidden = element.value == "other" ? false : true;
       }
       window.api.receive("getStudentDataFromMain", (data) => {
+        loadSideBar(data.students);
         jobs = data.jobs;
         //set save data button event
         let SaveDataButton = document.getElementById("SaveDataButton");
@@ -1409,5 +1406,6 @@
     <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="./js/main.js"></script>
     <script src="./js/fieldsValidation.js"></script>
+    <script src="../views/js/loadSideBar.js"></script>
   </body>
 </html>

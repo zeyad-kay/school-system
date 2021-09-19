@@ -73,10 +73,12 @@ const getEssentialData = async () => {
   // get all nationalities
   let nationalities = await db["Nationality"].findAll();
   nationalities = mapToJSON(nationalities);
+  let students = await student.getAllStudents();
   return {
     stagesData,
     jobs,
-    nationalities
+    nationalities,
+    students
   };
 }
 // get essintial Data 
@@ -90,10 +92,17 @@ ipcMain.on("getEssentialData", function (err, destination) {
         mainWindow.webContents.send("sentEssentialData", data);
         ipcMain.removeListener("ScriptLoaded", cb);
       });
+    } else if (destination === "affairsHome") {
+      mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
+      ipcMain.on("ScriptLoaded", function cb() {
+        mainWindow.webContents.send("sentEssentialData", data.students);
+        ipcMain.removeListener("ScriptLoaded", cb);
+      });
     }
   });
 
 });
+
 ipcMain.on("addNewStudentRequest", (err, { studentData, fatherData, motherData, resData }) => {
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   student.addNewStudent(fatherData, motherData, resData, studentData.studentData,
@@ -119,19 +128,21 @@ ipcMain.on("UpdateStudentData", function (err, { studentId, studentData, fatherD
   student.updateStudentByStudentId(studentId, fatherData, motherData, resData, studentData.studentData,
     studentData.StudentClassId).then(() => {
       student.getStudentData(studentId).then(data => {
-        mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
-        ipcMain.on("ScriptLoaded", function cb() {
-          mainWindow.webContents.send("getStudentDataFromMain", data);
-          ipcMain.removeListener("ScriptLoaded", cb);
-        });
+        student.getAllStudents().then(students => {
+          data = {
+            ...data,
+            students  
+          }
+          mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
+          ipcMain.on("ScriptLoaded", function cb() {
+            mainWindow.webContents.send("getStudentDataFromMain", data);
+            ipcMain.removeListener("ScriptLoaded", cb);
+          });
+        }).catch(console.log);
       }).catch(console.log);
     }).catch(err => {
       alert(err);
     });
-  // console.log(studentData);
-  // console.log(fatherData);
-  // console.log(motherData);
-  // console.log(resData);
 })
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
@@ -146,7 +157,13 @@ ipcMain.on("login", function (event, args) {
       break;
     case "2":
       if (args[1] === "2468") {
-        mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
+        student.getAllStudents().then(students => {
+          mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
+          ipcMain.on("ScriptLoaded", function cb() {
+            mainWindow.webContents.send("sentEssentialData", students);
+            ipcMain.removeListener("ScriptLoaded", cb);
+          });
+        });
       } else
         break;
   }
@@ -155,10 +172,16 @@ ipcMain.on("sendStudentIdToMain", (err, studentId) => {
   // load screen
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   student.getStudentData(Number(studentId)).then(data => {
-    mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
-    ipcMain.on("ScriptLoaded", function cb() {
-      mainWindow.webContents.send("getStudentDataFromMain", data);
-      ipcMain.removeListener("ScriptLoaded", cb);
-    });
+    student.getAllStudents().then(students => {
+      data = {
+        ...data,
+        students  
+      }
+      mainWindow.loadFile(path.join(__dirname, "views/updateStudent.html"));
+      ipcMain.on("ScriptLoaded", function cb() {
+        mainWindow.webContents.send("getStudentDataFromMain", data);
+        ipcMain.removeListener("ScriptLoaded", cb);
+      });
+    }).catch(console.log);
   });
 });
