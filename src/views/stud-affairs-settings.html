@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اعدادات شؤون الطلاب</title>
+    <link rel="stylesheet" href="../../node_modules/datatables.net-dt/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="./scss/affairs.css">
+    <link rel="stylesheet" href="../../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <!--start of navbar-->
+    <nav class="navbar navbar-expand-lg  navbar-dark" dir="rtl">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">معهد الوفاء</a>
+          <button
+            class="navbar-toggler rounded-pill text-warning me-auto"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebar"
+            aria-controls="sidebar"
+          >
+            <i class="bi bi-arrow-right-circle"></i>
+          </button>
+          <button
+            class="navbar-toggler me-auto"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <form class="d-flex me-auto mt-3 mt-md-0">
+              <input
+                class="text-center form-control mx-3 rounded-pill"
+                type="search"
+                placeholder="ابحث"
+                aria-label="Search"
+              />
+              <button
+                class="btn btn-outline-warning rounded-circle"
+                type="submit"
+              >
+                <i class="bi bi-search"></i>
+              </button>
+            </form>
+            <div class="mx-5 nav">
+              <button
+                class="
+                  btn btn-warning
+                  mx-md-3 mx-4
+                  my-2
+                  d-inline-block
+                  rounded-pill
+                "
+              >
+                <a class="text-decoration-none text-dark" href="#">التقارير</a>
+              </button>
+              <button
+                class="
+                  btn btn-warning
+                  mx-md-3 mx-4
+                  my-2
+                  d-inline-block
+                  rounded-pill
+                "
+              >
+                <a class="text-decoration-none text-dark" href="./Exams.html"
+                  >ارقام الجلوس</a
+                >
+              </button>
+              <button
+                class="
+                  btn btn-warning
+                  mx-md-3 mx-4
+                  my-2
+                  d-inline-block
+                  rounded-pill
+                "
+                type="button"
+                onclick='window.api.send("getEssentialData", "addStudent");'
+              >
+                تسجيل طالب جديد
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <!--end of navbar-->
+
+    <main dir="rtl" class="mx-5 mt-2 mb-5" id="Expenses-general">
+      <section id="newClass" class="my-5 py-3">
+        <h1 class="text-center py-4 border-2 border-bottom border-dark"> اضافه فصل جديد</h1>
+        <div class="row gx-5 mt-5" dir="rtl">
+            <div class="col-8">
+                <select class="form-select" aria-label="Default select example">
+                    <option selected>الصف</option>
+                    <option value="1">الصف الاول الابتدائي</option>
+                    <option value="2">الصف الثانى الابتدائي</option>
+                    <option value="3">الصف الثالث الابتدائي</option>
+                    <option value="4">الصف الرابع الابتدائي</option>
+                    <option value="5">الصف الخامس الابتدائي</option>
+                    <option value="6">الصف السادس الابتدائي</option>
+                    <option value="6">الصف الاول اﻻعدادي</option>
+                    <option value="6">الصف الثانى اﻻعدادي</option>
+                    <option value="6">الصف الثالث اﻻعدادي</option>
+                    <option value="6">الصف الاول الثانوى</option>
+                    <option value="6">الصف الثانى الثانوى</option>
+                    <option value="6">الصف الثالث الثانوى</option>
+                  </select>
+            </div>
+            <div class="col-4">
+                <button class="btn w-50 btn-primary"> اضافه فصل جديد </button>
+            </div>
+        </div>
+      </section>
+      <section id="newJob" class="my-5 py-3">
+        <h1 class="text-center py-4 border-2 border-bottom border-dark"> اضافه وظيفه جديد</h1>
+        <div class="row gx-5 mt-5" dir="rtl">
+            <div class="col-8">
+                <div class="input-group mb-3">
+                    <span class="input-group-text rounded-pill  mx-2" id="inputGroup-sizing-default"> اسم الوظيفه </span>
+                    <input type="text" class="rounded-pill form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                  </div>
+            </div>
+            <div class="col-4">
+                <button class="btn w-50 btn-primary"> اضف وظيفه جديد </button>
+            </div>
+        </div>
+      </section>
+      <section id="newAbsenceType" class="my-5 py-3">
+        <h1 class="text-center py-4 border-2 border-bottom border-dark"> اضافه نوع غياب جديد</h1>
+        <div class="row gx-5 mt-5" dir="rtl">
+            <div class="col-8">
+                <div class="input-group mb-3">
+                    <span class="input-group-text rounded-pill  mx-2" id="inputGroup-sizing-default"> نوع الغياب </span>
+                    <input type="text" class="rounded-pill form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                </div>
+            </div>
+            <div class="col-4">
+                <button class="btn w-50 btn-primary"> اضف نوع غياب جديد </button>
+            </div>
+        </div>
+      </section>
+
+    </main>
+
+
+
+
+
+    <script src="../../node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+    <script src="./js/main.js"></script>
+    <script>
+        $(document).ready( function () {
+            $('#mytable').DataTable({
+                searching: true,
+                ordering:  true,
+            });
+        } );
+    </script>
+</body>
+</html>
