@@ -5,6 +5,10 @@ const {
   getTransferredStudents,
   getGradeCapacity,
   AbsentDays,
+  studentsAges,
+  siblings,
+  motherData,
+  classList,
 } = require("./affairs");
 
 const {
@@ -41,7 +45,7 @@ const Reports = {
     },
     TransferredStudents: {
       query: getTransferredStudents,
-      headers: ["اسم الطالب", "اسم المدرسة المحول لها", "تاريخ التحويل"],
+      headers: ["اسم الطالب", "اسم المدرسة المحول لها", "نوع المدرسة", "نوع التحويل", "تاريخ التحويل"],
       title: "المحولين من المدرسة",
     },
     GradeCapacity: {
@@ -54,6 +58,35 @@ const Reports = {
       headers: ["الصف", "الفصل", "اسم الطالب", "سبب الغياب", "تاريخ الغياب"],
       title: "الغياب",
     },
+    StudentsAges: {
+      query: studentsAges,
+      headers: [
+        "اسم الطالب",
+        "تاريخ الميلاد",
+        "العمر",
+        "الجنسية",
+        "اسم ولي الأمر",
+        "وظيفة ولي الأمر",
+        "عنوان ولي الأمر",
+        "الصف",
+      ],
+      title: "أعمار الطلاب",
+    },
+    siblings: {
+      query: siblings,
+      headers: ["اسم الطالب", "الصف", "الفصل"],
+      title: "الأشقاء"
+    },
+    motherData: {
+      query: motherData,
+      headers: ["اسم الطالب", "اسم الأم", "المؤهل", "الوظيفة", "حالة الأسرة", "الهاتف", "العنوان"],
+      title: "بيانات الأم",
+    },
+    classList: {
+      query: classList,
+      headers: ["اسم الطالب", "ملاحظات"],
+      title: "قائمة الطلاب",
+    }
   },
   Expanses: {
     DailyExpanses: {

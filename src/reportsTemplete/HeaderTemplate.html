@@ -1,0 +1,38 @@
+<html>
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+</head>
+
+<body>
+    
+    {{#each $pdf.pages}}
+    {{#if @index}}
+    <div style="page-break-before: always;"></div>
+    {{/if}}
+    <header class="
+        border-1 border-bottom border-dark
+        d-flex
+        flex-row
+        justify-content-around
+        mt-2
+        mb-5
+        px-2
+      ">
+        <!-- <div class="d-flex flex-column justify-content-center" id="logo">
+        -to add the school logo just change the src of the below <img> tag-->
+        <!-- <img src="{{logo}}" width="70%" height="80%" alt="logo" /> -->
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+            <h4>{{title}}</h4>
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+            <span>نموذج رقم:١١ ٤٦</span>
+            <span>اصدار رقم:٢</span>
+            <span>تاريخ اﻻصدار: ٢٠١٤/١١/٢٤</span>
+        </div>
+    </header>
+    {{/each}}
+</body>
+
+</html>

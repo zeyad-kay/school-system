@@ -401,7 +401,7 @@ const getTransferredStudents = async (notBefore) => {
   }
   return db["TransferredStudent"]
     .findAll({
-      attributes: ["TransferDate", "SchoolName"],
+      attributes: ["TransferDate", "SchoolName", "SchoolType", "TransferType"],
       include: {
         model: db["Student"],
         attributes: ["StudentName"],
@@ -420,6 +420,8 @@ const getTransferredStudents = async (notBefore) => {
         return [
           s["Student"]["StudentName"],
           s["SchoolName"],
+          s["SchoolType"],
+          s["TransferType"],
           s["TransferDate"],
         ];
       }),
@@ -480,9 +482,11 @@ const absenceSummary = async (
   stageId,
   gradeId,
   classId,
+  inequality
 ) => {
   let query =
-    "SELECT \"StudentName\", \"ClassName\", COUNT(\"StudentAbsent\".\"AbsentDate\") AS \"TotalAbsentDays\", \"GradeName\", \"StageName\", \"ParentPhoneNumber\"  FROM \"Student\"\
+    "SELECT \"StudentName\", \"ClassName\", COUNT(\"StudentAbsent\".\"AbsentDate\") AS \"TotalAbsentDays\", \"GradeName\", \"StageName\", \"ParentPhoneNumber\"\
+      FROM \"Student\"\
   JOIN \"StudentAbsent\" ON \"Student\".\"StudentId\" = \"StudentAbsent\".\"StudentId\"\
   JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
   JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
@@ -514,7 +518,21 @@ const absenceSummary = async (
   }
   query +=
     " GROUP BY \"StudentName\", \"Stage\".\"StageId\", \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"ParentPhoneNumber\"\
-  HAVING COUNT(\"StudentAbsent\".\"AbsentDate\") >= " +
+  HAVING COUNT(\"StudentAbsent\".\"AbsentDate\") ";
+  switch (inequality) {
+  case ">=":
+    query += ">=";
+    break;
+  case "<=":
+    query += "<=";
+    break;
+  case "=":
+    query += "=";
+    break;
+  default:
+    query += ">=";
+  }
+  query += " " + 
     minDays +
     " ORDER BY \"Stage\".\"StageId\", \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"StudentName\"";
 
@@ -522,22 +540,29 @@ const absenceSummary = async (
 
   return db.sequelize.query(query).then((students) => {
     students[0].forEach((student) => {
-      if (!data[student["StageName"]]) {
-        data[student["StageName"]] = {};
+      // if (!data[student["StageName"]]) {
+      //   data[student["StageName"]] = {};
+      // }
+
+      if (!data[student["GradeName"]]) {
+        data[student["GradeName"]] = [student];
+      } else {
+        const index = data[student["GradeName"]].findIndex(s => student["StudentName"] === s["StudentName"]);
+        if (index !== -1) {
+          data[student["GradeName"]][index]["ParentPhoneNumber"] += `, ${student["ParentPhoneNumber"]}`;
+        } else {
+          data[student["GradeName"]].push(student);
+        }
       }
-      if (!data[student["StageName"]][student["GradeName"]]) {
-        data[student["StageName"]][student["GradeName"]] = {};
-      }
-      if (
-        !data[student["StageName"]][student["GradeName"]][student["ClassName"]]
-      ) {
-        data[student["StageName"]][student["GradeName"]][student["ClassName"]] =
-          [];
-      }
-      data[student["StageName"]][student["GradeName"]][
-        student["ClassName"]
-      ].push(student);
+      
+      // if (
+      //   !data[student["StageName"]][student["GradeName"]][student["ClassName"]]
+      // ) {
+      //   data[student["StageName"]][student["GradeName"]][student["ClassName"]] =
+      //     [];
+      // }
     });
+    console.log(data);
     return data;
   });
 };
@@ -557,14 +582,12 @@ JOIN \"Student\" ON \"Responsible\".\"ParentId\" = \"Student\".\"StudentResponsi
 GROUP BY \"Responsible\".\"ParentId\"\
 HAVING COUNT(\"Student\".\"StudentName\") = " +
     numOfSiblings +
-    ")";
+    ")" + "ORDER BY \"Responsible\".\"ParentName\"";
 
   return db.sequelize.query(query).then((students) => {
     return students[0].map((student) => {
       return [
         student["StudentName"],
-        student["ParentName"],
-        student["StageName"],
         student["GradeName"],
         student["ClassName"],
       ];
@@ -575,7 +598,7 @@ HAVING COUNT(\"Student\".\"StudentName\") = " +
 const classList = async (stageId, gradeId, classId) => {
   let query =
     "\
-  SELECT \"Student\".\"StudentName\" FROM \"Student\"\
+  SELECT \"Student\".\"StudentName\", \"ClassName\", \"GradeName\" FROM \"Student\"\
 JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
 JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
 JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
@@ -592,12 +615,12 @@ ORDER BY \"Student\".\"StudentName\"\
 
   return db.sequelize.query(query).then((students) => {
     return students[0].map((student) => {
-      return student["StudentName"];
+      return [student["StudentName"], ""];
     });
   });
 };
 
-const motherData = async () => {
+const motherData = async (gradeId) => {
   const query =
     "\
   SELECT \"Student\".\"StudentName\", \"Mother\".\"ParentName\", \"Mother\".\"ParentAcademicDegree\", \"Job\".\"JobName\",\
@@ -609,32 +632,41 @@ JOIN \"Parent\" AS \"Mother\" ON \"Student\".\"StudentMotherId\" = \"Mother\".\"
 LEFT JOIN \"ParentJob\" ON \"Mother\".\"ParentId\" = \"ParentJob\".\"ParentId\"\
 LEFT JOIN \"Job\" ON \"ParentJob\".\"ParentJobId\" = \"Job\".\"JobId\"\
 LEFT JOIN \"ParentPhone\" ON \"Mother\".\"ParentId\" = \"ParentPhone\".\"ParentId\"\
+WHERE \"Grade\".\"GradeId\" = " + gradeId + " \
 GROUP BY \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"Student\".\"StudentName\", \"Mother\".\"ParentName\",\
          \"Mother\".\"ParentAcademicDegree\", \"Job\".\"JobName\", \"Student\".\"StudentFamilyStatus\",\
          \"ParentPhone\".\"ParentPhoneNumber\", \"Student\".\"StudentAddress\"\
   ";
+  const data = [];
   return db.sequelize.query(query).then((students) => {
-    return students[0].map((student) => {
-      return [
-        student["StudentName"],
-        student["ParentName"],
-        student["ParentAcademicDegree"],
-        student["JobName"] || "لا يوجد",
-        student["StudentFamilyStatus"],
-        student["ParentPhoneNumber"] || "لا يوجد",
-        student["StudentAddress"],
-      ];
+    students[0].map((student) => {
+      const index = data.findIndex(s => s["StudentName"] === student["StudentName"]);
+      if (index === -1) {
+        data.push([
+          student["StudentName"],
+          student["ParentName"],
+          student["ParentAcademicDegree"],
+          student["JobName"] || "لا يوجد",
+          student["StudentFamilyStatus"],
+          student["ParentPhoneNumber"] || "لا يوجد",
+          student["StudentAddress"],
+        ]);
+      } else {
+        data[index] += `, ${student["ParentPhoneNumber"]}`;
+        data[student["GradeName"]].push(student);
+      }
     });
+    return data;
   });
 };
 
-const studentsAges = async () => {
+const studentsAges = async (gradeId) => {
   const query =
     "\
   SELECT \"Student\".\"StudentName\", \"Student\".\"StudentBirthDate\",\
        age((date_part('year', now()) || '-10-01')::date, \"Student\".\"StudentBirthDate\"),\
        \"Nationality\".\"NationalityName\", \"Responsible\".\"ParentName\", \"Job\".\"JobName\", \"Responsible\".\"ParentAddress\",\
-    \"Grade\".\"GradeName\", \"Class\".\"ClassName\"\
+    \"Grade\".\"GradeName\"\
   FROM \"Student\"\
   JOIN \"Nationality\" ON \"Student\".\"StudentNationalityId\" = \"Nationality\".\"NationalityId\"\
   JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
@@ -643,20 +675,51 @@ const studentsAges = async () => {
   JOIN \"Parent\" AS \"Responsible\" ON \"Student\".\"StudentResponsibleId\" = \"Responsible\".\"ParentId\"\
   LEFT JOIN \"ParentJob\" ON \"Responsible\".\"ParentId\" = \"ParentJob\".\"ParentId\"\
   LEFT JOIN \"Job\" ON \"ParentJob\".\"ParentJobId\" = \"Job\".\"JobId\"\
-  ORDER BY \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"Student\".\"StudentName\"\
+  WHERE \"Grade\".\"GradeId\" = " + gradeId + " \
+  ORDER BY \"Grade\".\"GradeId\", \"Student\".\"StudentName\"\
   ";
   return db.sequelize.query(query).then((students) => {
     return students[0].map((student) => {
+      let age = student["age"]["years"];
+      student["age"]["years"] > 10 ? age += " سنة" : age += " سنوات";
+      if (student["age"]["months"]) {
+        age += " و ";
+        switch (student["age"]["months"]) {
+        case 1:
+          age += "شهر";
+          break;
+        case 2:
+          age += "شهرين";
+          break;
+        case 11:
+          age += "11 شهر";
+          break;
+        default:
+          age += student["age"]["months"] + " أشهر";
+        }
+      }
+      if (student["age"]["days"]) {
+        age += " و ";
+        switch (student["age"]["days"]) {
+        case 1:
+          age += "يوم";
+          break;
+        case 2:
+          age += "يومين";
+          break;
+        default:
+          student["age"]["days"] < 11 ? age += " " + student["age"]["days"] + " أيام" : age += " " + student["age"]["days"] + " يوم";
+        }
+      }
       return [
         student["StudentName"],
         student["StudentBirthDate"],
-        student["age"],
+        age,
         student["NationalityName"],
         student["ParentName"],
         student["JobName"] || "لا يوجد",
         student["ParentAddress"],
         student["GradeName"],
-        student["ClassName"],
       ];
     });
   });

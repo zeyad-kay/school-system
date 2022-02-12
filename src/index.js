@@ -13,8 +13,12 @@ const { StartNewYear } = require("./queries/newYear");
 const reports = require("./reports/reports");
 const Bus = require("./queries/BusRoutes");
 const seats = require("./queries/seats");
+const { absenceSummary, classList } = require("./reports/affairs");
 const fs = require("fs");
 const url = require("url");
+const { data } = require("jquery");
+const { Console } = require("console");
+const { getSeatsData } = require("./reports/affairs");
 let CWD = process.cwd();
 
 const rootDir = process.platform === "darwin" ? __dirname : CWD;
@@ -22,9 +26,6 @@ const rootDir = process.platform === "darwin" ? __dirname : CWD;
 const jsreport = require("jsreport")({
   rootDirectory: rootDir
 });
-// require("electron-reload")(__dirname, {
-//   electron: require("../node_modules/electron"),
-// });
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -46,8 +47,8 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  // mainWindow.loadFile(path.join(__dirname, "views/login.html"));
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  mainWindow.loadFile(path.join(__dirname, "views/login.html"));
+  // mainWindow.loadFile(path.join(__dirname, "index.html"));
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 };
@@ -141,35 +142,90 @@ const getEssentialData = async () => {
     stagesData2
   };
 };
-// handling action that was generated from renderer process
-ipcMain.on("render-report", async (event, data) => {
+ipcMain.on("getAbsenceReport", async (err, { fromDate,
+  toDate,
+  StageId,
+  GradeId,
+  ClassId,
+  absenceNumber, criteria }) => {
 
+  if (StageId === "0") StageId = null;
+  if (GradeId === "0") GradeId = null;
+  if (ClassId === "0") ClassId = null;
+  console.log({ criteria });
+  let rows = await absenceSummary(fromDate, toDate, absenceNumber, StageId, GradeId, ClassId, criteria);
+  let title = "تقرير غياب";
+  let r = [];
+  let subHeaders = [];
+  for (let [key, value] of Object.entries(rows)) {
+    subHeaders.push(key);
+    r.push(value);
+  }
+  console.log(subHeaders);
+  renderReport({ title, rows: r, subHeaders }, reportTypes.absence);
+});
+let reportTypes = {
+  absence: "0",
+  seats:"2",
+  regular: "1"
+};
+ipcMain.on("printReport", (err, data) => {
+  renderReport(data, reportTypes.regular);
+  // renderReport
+});
+
+async function renderReport(data, reportType) {
   try {
     // we defer jsreport initialization on first report render
     // to avoid slowing down the app at start time
     if (!jsreport._initialized) {
       await jsreport.init();
     }
-
     try {
       let cur = __dirname.split("\\");
       cur.pop();
       cur = cur.join("\\");
+      let pth = "";
+      if (reportType === reportTypes.absence) {
+        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/PDFAbsenceReport.html")).toString();
+      }else if(reportType === reportTypes.seats){
+        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/SeatNumberCard.html")).toString();
+      }
+      else {
+        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/regularReportTemplate.html")).toString();
+      }
       const resp = await jsreport.render({
         template: {
-          content: fs.readFileSync(path.join(__dirname, "./report.html")).toString(),
+          content: pth,
+          helpers: "function isEqual(v1,v2,options) { if(v1 === v2) {return options.fn(this);} return options.inverse(this);}",
           engine: "handlebars",
-          recipe: "chrome-pdf"
+          recipe: "chrome-pdf",
+          chrome: {
+            "displayHeaderFooter": true,
+            "landscape" : reportType === reportTypes.seats ? true : false,
+            "format" : "A4",
+            "marginTop": "20px",
+            "marginRight": "20px",
+            "marginBottom": "20px",
+            "marginLeft": "20px",
+            "scale" : reportType === reportTypes.seats ? 0.6 : 1
+          }
         },
         data: {
           popper: cur + "/node_modules/@popperjs/core/dist/umd/popper.min.js",
           bootstrapjs: cur + "/node_modules/bootstrap/dist/js/bootstrap.min.js",
           bootstrapcss: cur + "/node_modules/bootstrap/dist/css/bootstrap.min.css",
           logo: cur + "/src/assets/images/index.png",
-          rows: data
+          rows: data.rows,
+          subHeaders: data.subHeaders,
+          title: data.title,
+          stageName : data.stageName,
+          gradeName : data.gradeName,
+          yearStart : data.yearStart,
+          yearEnd : data.yearEnd
         }
       });
-      
+
       fs.writeFileSync(path.join(CWD, "report.pdf"), resp.content);
 
       const pdfWindow = new BrowserWindow({
@@ -185,15 +241,14 @@ ipcMain.on("render-report", async (event, data) => {
         protocol: "file"
       }));
 
-      event.sender.send("render-finish", {});
     } catch (e) {
+      console.log(e);
       DialogBox(["error while rendering jsreport"], "error", "error while starting jsreport");
     }
   } catch (e) {
-    console.log(e);
     DialogBox(["error while starting jsreport"], "error", "error while starting jsreport");
   }
-});
+}
 
 // listen for dialogboxes
 ipcMain.on("ShowDialogBox", (err, { messages, type, title }) => {
@@ -337,13 +392,14 @@ ipcMain.on("addAbsentType", (err, AbsentReasonName) => {
 // Generate Students Seats 
 ipcMain.on("GenerateStudentsSeats", function (err, { gradeId, seatStart, seatStep }) {
   seats.generateStudentSeats(gradeId, seatStart, seatStep).then((results) => {
-    console.log(results);
-    DialogBox(["تم توليد الأرقام الجلوس"], "info", "تم");
   }).catch(err => {
     console.log(err);
     DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
   });
 });
+// ipcMain.on("render-pdf-report", () = {
+
+// })
 // get essintial Data
 ipcMain.on("getEssentialData", function (err, destination) {
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
@@ -388,6 +444,14 @@ ipcMain.on("getEssentialData", function (err, destination) {
         ipcMain.removeListener("ScriptLoaded", cb);
       });
     });
+  } else if (destination === "studentsAbsentReport") {
+    getEssentialData().then((data) => {
+      mainWindow.loadFile(path.join(__dirname, "views/AbsenceReportSettings.html"));
+      ipcMain.on("ScriptLoaded", function cb() {
+        mainWindow.webContents.send("sentEssentialData", data.stagesData);
+        ipcMain.removeListener("ScriptLoaded", cb);
+      });
+    });
   } else {
     // get all stages , grades and classes
     getEssentialData().then((data) => {
@@ -427,11 +491,12 @@ ipcMain.on("getEssentialData", function (err, destination) {
     });
   }
 });
+
 // transferStudent
-ipcMain.on("transferStudent", (err, { studentId, SchoolName }) => {
+ipcMain.on("transferStudent", (err, { studentId, SchoolName, SchoolType, TransferType }) => {
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   student
-    .transferStudent(studentId, SchoolName)
+    .transferStudent(studentId, SchoolName, SchoolType, TransferType)
     .then(() => {
       student.getAllStudents().then((students) => {
         mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
@@ -671,8 +736,9 @@ ipcMain.on("login", function (event, args) {
             ipcMain.removeListener("ScriptLoaded", cb);
           });
         });
-      }else {
+      } else {
         DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+        mainWindow.loadFile(path.join(__dirname, "views/login.html"));
       }
       break;
     case "2":
@@ -739,6 +805,19 @@ ipcMain.on("receiveWarning", (err, { StudentId, WarningDate }) => {
       console.log(err);
       DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
     });
+});
+ipcMain.on("generateStudentsCards", (err, { gradeId, gradeName, stageName,yearStart,yearEnd }) => {
+  // console.log(gradeId,gradeName,stageName);
+  getSeatsData(gradeId).then(data => {
+    let d = {
+      rows : data,
+      gradeName,
+      stageName,
+      yearStart,
+      yearEnd
+    }
+    renderReport(d,reportTypes.seats);
+  });
 });
 ipcMain.on("sendAffairsReportData", (err, args) => {
   // load screen

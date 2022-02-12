@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{bootstrapcss}}" />
+    <title>{{title}}</title>
+    <style>
+        *{
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+</head>
+
+<body dir="rtl">
+    <header class="
+    border-1 border-bottom border-dark
+    d-flex
+    flex-row
+    justify-content-around
+    mt-2
+    mb-5
+    px-2
+  ">
+        <!-- <div class="d-flex flex-column justify-content-center" id="logo">
+    -to add the school logo just change the src of the below <img> tag-->
+        <!-- <img src="{{logo}}" width="70%" height="80%" alt="logo" /> -->
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+            <h4>{{title}}</h4>
+        </div>
+        <div class="d-flex flex-column justify-content-center">
+            <span>نموذج رقم:١١ ٤٦</span>
+            <span>اصدار رقم:٢</span>
+            <span>تاريخ اﻻصدار: ٢٠١٤/١١/٢٤</span>
+        </div>
+    </header>
+    <div class="px-3 table-responsive">
+        <table class="table table-bordered border border-dark border-3">
+            <thead>
+                {{#each subHeaders}}
+                <th scope="col">{{this}}</th>
+                {{/each}}
+            </thead>
+            <tbody>
+                {{#each rows}}
+                <!-- {{#isEqual @index 20}}
+                    <div style='page-break-before: always;'></div>
+                    {{/isEqual}} -->
+                <tr>
+                    {{#each this}}
+                    <td>{{this}}</td>
+                    {{/each}}
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    <script src="{{popper}}"></script>
+    <script src="{{bootstrapjs}}"></script>
+</body>
+<script>
+</script>
+
+</html>
