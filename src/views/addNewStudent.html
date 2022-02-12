@@ -31,61 +31,100 @@
           <datalist id="StudentListForSearch">
           </datalist>
         </form>
-        <div class="dropdown mx-5">
-          <button class="btn btn-warning dropdown-toggle rounded-pill" type="button" id="dropdownMenuButton1"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            التقارير
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            <li>
-              <a class="dropdown-item btn" href="#"> نسبه الغياب&raquo;</a>
-              <ul class="dropdown-menu dropdown-submenu">
-                <li class="mx-1">
-                  <div class="input-group mb-3 mt-3" dir="rtl">
-                    <span class="input-group-text" id="basic-addon1">
-                      من
-                    </span>
-                    <input id="absentFrom" type="date" class="form-control" placeholder="Username" aria-label="Username"
-                      aria-describedby="basic-addon1" />
-                  </div>
-                  <div class="input-group mb-3 mt-3" dir="rtl">
-                    <span class="input-group-text" id="basic-addon1">
-                      الي
-                    </span>
-                    <input id="absentTo" type="date" class="form-control" placeholder="Username" aria-label="Username"
-                      aria-describedby="basic-addon1" />
-                  </div>
-                  <a href="#" class="btn btn-warning rounded-pill"
-                    onclick='window.api.send("sendAffairsReportData", ["AbsenceRate", [document.querySelector("#absentFrom").value, document.querySelector("#absentTo").value]])'>
-                    تاكيد التاريخ و الذهاب للتقرير
+        <div class="collapse navbar-collapse" id="main_nav">
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown" id="myDropdown">
+              <a class="nav-link dropdown-toggle btn btn-warning mx-2 rounded-pill text-black" href="#"
+                data-bs-toggle="dropdown"><span class="mx-1">التقارير</span></a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item btn" href="#"> نسبه الغياب&raquo;</a>
+                  <ul class="dropdown-menu dropdown-submenu">
+                    <li class="mx-1">
+                      <div class="input-group mb-3 mt-3" dir="rtl">
+                        <span class="input-group-text" id="basic-addon1">
+                          من
+                        </span>
+                        <input id="absentFrom" type="date" class="form-control" placeholder="Username"
+                          aria-label="Username" aria-describedby="basic-addon1" />
+                      </div>
+                      <div class="input-group mb-3 mt-3" dir="rtl">
+                        <span class="input-group-text" id="basic-addon1">
+                          الي
+                        </span>
+                        <input id="absentTo" type="date" class="form-control" placeholder="Username"
+                          aria-label="Username" aria-describedby="basic-addon1" />
+                      </div>
+                      <a href="#" class="btn btn-warning rounded-pill"
+                        onclick='window.api.send("sendAffairsReportData", ["AbsenceRate", [document.querySelector("#absentFrom").value, document.querySelector("#absentTo").value]])'>
+                        تاكيد التاريخ و الذهاب للتقرير
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a class="dropdown-item btn" href="#"
+                    onclick='window.api.send("sendAffairsReportData", ["TransferredStudents", []])'>
+                    المحولين من المدرسة
                   </a>
                 </li>
+                <li>
+                  <a class="dropdown-item btn" href="#"
+                    onclick='window.api.send("sendAffairsReportData", ["StudentsOfColleagues", []])'>
+                    طﻻب العاملين
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    onclick='window.api.send("sendAffairsReportData", ["GradeCapacity", [1]])'>
+                    كثافة الفصول &raquo;
+                  </a>
+                  <ul class="dropdown-menu dropdown-submenu" id="Capacities"></ul>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    onclick='window.api.send("sendAffairsReportData", ["StudentsAges", []])'>
+                    أعمار الطلاب &raquo;
+                  </a>
+                  <ul class="dropdown-menu dropdown-submenu" id="Ages"></ul>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    onclick='window.api.send("sendAffairsReportData", ["StudentsAges", []])'>
+                    بيانات الأم &raquo;
+                  </a>
+                  <ul class="dropdown-menu dropdown-submenu" id="MotherData"></ul>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    onclick='window.api.send("sendAffairsReportData", ["StudentsAges", []])'>
+                    قائمة الفصول &raquo;
+                  </a>
+                  <ul class="submenu dropdown-menu" id="ClassList"></ul>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"> ارقام الجلوس &raquo;</a>
+                  <ul class="dropdown-menu dropdown-submenu" id="SeatsId"></ul>
+                </li>
+                <li>
+                  <a class="dropdown-item btn" href="#"> الأشقاء&raquo;</a>
+                  <ul class="dropdown-menu dropdown-submenu">
+                    <li class="mx-1">
+                      <div class="input-group mb-3 mt-3" dir="rtl">
+                        <span class="input-group-text" id="basic-addon1">
+                          من
+                        </span>
+                        <input id="siblings" type="number" min="2" step="1" class="form-control" placeholder="Username"
+                          aria-label="Username" aria-describedby="basic-addon1" />
+                      </div>
+                      <a href="#" class="btn btn-warning rounded-pill"
+                        onclick='window.api.send("sendAffairsReportData", ["siblings", [document.querySelector("#siblings").value]])'>
+                        الذهاب للتقرير
+                      </a>
+                    </li>
+                  </ul>
+                </li>
               </ul>
-            </li>
-            <li>
-              <a class="dropdown-item btn" href="#"
-                onclick='window.api.send("sendAffairsReportData", ["TransferredStudents", []])'>
-                المحذوفين
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item btn" href="#"
-                onclick='window.api.send("sendAffairsReportData", ["StudentsOfColleagues", []])'>
-                طﻻب العاملين
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#"
-                onclick='window.api.send("sendAffairsReportData", ["GradeCapacity", [1]])'>
-                كثافة الفصول &raquo;
-              </a>
-              <ul class="dropdown-menu dropdown-submenu" id="Capacities"></ul>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#"> ارقام الجلوس &raquo;</a>
-              <ul class="dropdown-menu dropdown-submenu" id="SeatsId"></ul>
-            </li>
-          </ul>
         </div>
         <div class="mx-5 nav">
           <button class="
@@ -131,7 +170,7 @@
         <button type="button" class="btn-close btn-close-white d-md-none me-auto text-reset" data-bs-dismiss="offcanvas"
           aria-label="Close"></button>
       </div>
-      <div id="" class="offcanvas-body justify-content-center" dir="rtl">
+      <div class="offcanvas-body justify-content-center" dir="rtl">
         <ul class="nav nav-pills" id="pills-tab" role="tablist"></ul>
         <div class="tab-content mt-2" id="pills-tabContent"></div>
       </div>
@@ -258,15 +297,11 @@
         </div>
       </div>
       <div class="row mb-2" dir="rtl">
-        <div class="col">
-          <select class="form-select" id="StudentFamilyStatus" aria-label="Default select example">
-            <option selected>الحاله العائليه</option>
-            <option value="ORPHAN">يتيم</option>
-            <option value="MARRIED">متزوج</option>
-            <option value="DIVORCED">مطلق</option>
-            <option value="DEAD MOTHER">الاب متوفي</option>
-            <option value="DEAD FATHER">اﻻم متوفيه</option>
-          </select>
+        <!-- StudentFamilyStatus -->
+        <div class="input-group input-group mb-2 col">
+          <span class="input-group-text" id="inputGroup-sizing">الحاله الصحيه:</span>
+          <input type="text" class="form-control" aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-sm" id="StudentFamilyStatus" />
         </div>
       </div>
 
@@ -289,7 +324,7 @@
 
       <div class="container row">
         <div class="form-check form-switch">
-          <input class="form-check-input" onchange="hideDadData()" type="checkbox" id="DeadDadTrigger" />
+          <input class="form-check-input" type="checkbox" id="DeadDadTrigger" />
           <label class="form-check-label h5" for="flexSwitchCheckDefault">متوفي</label>
         </div>
       </div>
@@ -331,11 +366,12 @@
           <div class="col-12">
             <div class="input-group input-group mb-2 col-md-6 col-12">
               <select id="DadAcademicDegree" class="form-select" aria-label="Default select example">
-                <option selected>شهاده الاب</option>
-                <option value="BACHELOR">بكالريوس</option>
-                <option value="PHD">دكتوراه</option>
-                <option value="MASTERS">ماجيستير</option>
-                <option value="SECONDARY">ثانويه</option>
+                <option value="0" selected>شهاده الاب</option>
+                <option value="تعليم عالي"> تعليم عالي</option>
+                <option value="تعليم متوسط">تعليم متوسط</option>
+                <option value="اعدادية">اعدادية</option>
+                <option value="دبلوم">دبلوم</option>
+                <option value="بدون مؤهل">بدون مؤهل</option>
               </select>
             </div>
           </div>
@@ -351,7 +387,7 @@
 
       <div class="container row">
         <div class="form-check form-switch">
-          <input class="form-check-input" onchange="hideMumData()" type="checkbox" id="DeadMomTrigger" />
+          <input class="form-check-input" type="checkbox" id="DeadMomTrigger" />
           <label class="form-check-label h5" for="DeadMomTrigger">متوفيه</label>
         </div>
       </div>
@@ -394,11 +430,12 @@
           <div class="col-12">
             <div class="input-group input-group mb-2 col-12">
               <select id="MomAcademicDegree" class="form-select" aria-label="Default select example">
-                <option selected>شهاده الام</option>
-                <option value="BACHELOR">بكالريوس</option>
-                <option value="PHD">دكتوراه</option>
-                <option value="MASTERS">ماجيستير</option>
-                <option value="SECONDARY">ثانويه</option>
+                <option value="0" selected>شهاده الام</option>
+                <option value="تعليم عالي"> تعليم عالي</option>
+                <option value="تعليم متوسط">تعليم متوسط</option>
+                <option value="اعدادية">اعدادية</option>
+                <option value="دبلوم">دبلوم</option>
+                <option value="بدون مؤهل">بدون مؤهل</option>
               </select>
             </div>
           </div>
@@ -465,11 +502,12 @@
           <div class="col-12">
             <div class="input-group input-group mb-2 col-12">
               <select id="ResAcademicDegree" class="form-select" aria-label="Default select example">
-                <option selected>شهاده ولي اﻻمر</option>
-                <option value="BACHELOR">بكالريوس</option>
-                <option value="PHD">دكتوراه</option>
-                <option value="MASTERS">ماجيستير</option>
-                <option value="SECONDARY">ثانويه</option>
+                <option value="0" selected>شهاده ولي اﻻمر</option>
+                <option value="تعليم عالي"> تعليم عالي</option>
+                <option value="تعليم متوسط">تعليم متوسط</option>
+                <option value="اعدادية">اعدادية</option>
+                <option value="دبلوم">دبلوم</option>
+                <option value="بدون مؤهل">بدون مؤهل</option>
               </select>
             </div>
           </div>
@@ -658,8 +696,9 @@
     const StageList = document.getElementById("StageList");
     const GradeList = document.getElementById("GradeList");
     const ClassList = document.getElementById("ClassList");
+    console.log(data.stagesData);
     //console.log(StageList);
-    data.stagesData.forEach((stage) => {
+    data.stagesData2.forEach((stage) => {
       const option = document.createElement("option");
       option.setAttribute("value", stage.StageId);
       option.innerText = stage.StageName;
@@ -668,7 +707,7 @@
 
     StageList.addEventListener("change", function () {
       let StageId = this.value;
-      data.stagesData.forEach((stage) => {
+      data.stagesData2.forEach((stage) => {
         if (stage.StageId == StageId) {
           // remover all elements in grade list
           const GradeList = document.getElementById("GradeList");
@@ -694,7 +733,7 @@
     GradeList.addEventListener("change", function (ev) {
       let StageId = document.getElementById("StageList").value;
       let GradeId = this.value;
-      data.stagesData.forEach((stage) => {
+      data.stagesData2.forEach((stage) => {
         if (stage.StageId == StageId) {
           stage.Grades.forEach((grade) => {
             if (grade.GradeId == GradeId) {
@@ -709,7 +748,7 @@
               Classes.forEach((clas) => {
                 const option = document.createElement("option");
                 option.setAttribute("value", clas.ClassId);
-                option.innerText = "الفصل " + clas.ClassId;
+                option.innerText = clas.ClassName;
                 counts++;
                 ClassList.appendChild(option);
               });

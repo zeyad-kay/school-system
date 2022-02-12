@@ -401,7 +401,7 @@ const getTransferredStudents = async (notBefore) => {
   }
   return db["TransferredStudent"]
     .findAll({
-      attributes: ["TransferDate", "SchoolName"],
+      attributes: ["TransferDate", "SchoolName", "SchoolType", "TransferType"],
       include: {
         model: db["Student"],
         attributes: ["StudentName"],
@@ -420,6 +420,8 @@ const getTransferredStudents = async (notBefore) => {
         return [
           s["Student"]["StudentName"],
           s["SchoolName"],
+          s["SchoolType"],
+          s["TransferType"],
           s["TransferDate"],
         ];
       }),
@@ -473,6 +475,256 @@ const AbsentDays = async () => {
     );
 };
 
+const absenceSummary = async (
+  startingDate,
+  endingDate,
+  minDays,
+  stageId,
+  gradeId,
+  classId,
+  inequality
+) => {
+  let query =
+    "SELECT \"StudentName\", \"ClassName\", COUNT(\"StudentAbsent\".\"AbsentDate\") AS \"TotalAbsentDays\", \"GradeName\", \"StageName\", \"ParentPhoneNumber\"\
+      FROM \"Student\"\
+  JOIN \"StudentAbsent\" ON \"Student\".\"StudentId\" = \"StudentAbsent\".\"StudentId\"\
+  JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
+  JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
+  JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+  JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"\
+  JOIN \"Parent\" As \"Responsible\" ON \"Student\".\"StudentResponsibleId\" = \"Responsible\".\"ParentId\"\
+  JOIN \"ParentPhone\" ON \"Responsible\".\"ParentId\" = \"ParentPhone\".\"ParentId\"\
+  WHERE \"AbsentDate\" > '" +
+    startingDate +
+    "' AND \"AbsentDate\" < '" +
+    endingDate +
+    "'";
+  if (classId) {
+    query +=
+      " AND \"Stage\".\"StageId\" = " +
+      stageId +
+      " AND \"Grade\".\"GradeId\" = " +
+      gradeId +
+      " AND \"Class\".\"ClassId\" = " +
+      classId;
+  } else if (gradeId) {
+    query +=
+      " AND \"Stage\".\"StageId\" = " +
+      stageId +
+      " AND \"Grade\".\"GradeId\" = " +
+      gradeId;
+  } else if (stageId) {
+    query += " AND \"Stage\".\"StageId\" = '" + stageId + "'";
+  }
+  query +=
+    " GROUP BY \"StudentName\", \"Stage\".\"StageId\", \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"ParentPhoneNumber\"\
+  HAVING COUNT(\"StudentAbsent\".\"AbsentDate\") ";
+  switch (inequality) {
+  case ">=":
+    query += ">=";
+    break;
+  case "<=":
+    query += "<=";
+    break;
+  case "=":
+    query += "=";
+    break;
+  default:
+    query += ">=";
+  }
+  query += " " + 
+    minDays +
+    " ORDER BY \"Stage\".\"StageId\", \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"StudentName\"";
+
+  const data = {};
+
+  return db.sequelize.query(query).then((students) => {
+    students[0].forEach((student) => {
+      // if (!data[student["StageName"]]) {
+      //   data[student["StageName"]] = {};
+      // }
+
+      if (!data[student["GradeName"]]) {
+        data[student["GradeName"]] = [student];
+      } else {
+        const index = data[student["GradeName"]].findIndex(s => student["StudentName"] === s["StudentName"]);
+        if (index !== -1) {
+          data[student["GradeName"]][index]["ParentPhoneNumber"] += `, ${student["ParentPhoneNumber"]}`;
+        } else {
+          data[student["GradeName"]].push(student);
+        }
+      }
+      
+      // if (
+      //   !data[student["StageName"]][student["GradeName"]][student["ClassName"]]
+      // ) {
+      //   data[student["StageName"]][student["GradeName"]][student["ClassName"]] =
+      //     [];
+      // }
+    });
+    console.log(data);
+    return data;
+  });
+};
+
+const siblings = async (numOfSiblings) => {
+  const query =
+    "\
+  SELECT \"Student\".\"StudentName\", \"Responsible\".\"ParentName\", \"Stage\".\"StageName\", \"Grade\".\"GradeName\", \"Class\".\"ClassName\" FROM \"Student\"\
+JOIN \"Parent\" AS \"Responsible\" ON \"Student\".\"StudentResponsibleId\" = \"ParentId\"\
+JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
+JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
+JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"\
+WHERE \"Student\".\"StudentResponsibleId\" IN\
+(SELECT \"Responsible\".\"ParentId\" FROM \"Parent\" AS \"Responsible\"\
+JOIN \"Student\" ON \"Responsible\".\"ParentId\" = \"Student\".\"StudentResponsibleId\"\
+GROUP BY \"Responsible\".\"ParentId\"\
+HAVING COUNT(\"Student\".\"StudentName\") = " +
+    numOfSiblings +
+    ")" + "ORDER BY \"Responsible\".\"ParentName\"";
+
+  return db.sequelize.query(query).then((students) => {
+    return students[0].map((student) => {
+      return [
+        student["StudentName"],
+        student["GradeName"],
+        student["ClassName"],
+      ];
+    });
+  });
+};
+
+const classList = async (stageId, gradeId, classId) => {
+  let query =
+    "\
+  SELECT \"Student\".\"StudentName\", \"ClassName\", \"GradeName\" FROM \"Student\"\
+JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
+JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
+JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"\
+WHERE \"Stage\".\"StageId\" = " +
+    stageId +
+    " AND \"Grade\".\"GradeId\" = " +
+    gradeId +
+    " AND \"Class\".\"ClassId\" = " +
+    classId +
+    " \
+ORDER BY \"Student\".\"StudentName\"\
+  ";
+
+  return db.sequelize.query(query).then((students) => {
+    return students[0].map((student) => {
+      return [student["StudentName"], ""];
+    });
+  });
+};
+
+const motherData = async (gradeId) => {
+  const query =
+    "\
+  SELECT \"Student\".\"StudentName\", \"Mother\".\"ParentName\", \"Mother\".\"ParentAcademicDegree\", \"Job\".\"JobName\",\
+       \"Student\".\"StudentFamilyStatus\", \"ParentPhone\".\"ParentPhoneNumber\", \"Student\".\"StudentAddress\" FROM \"Student\"\
+JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
+JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
+JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+JOIN \"Parent\" AS \"Mother\" ON \"Student\".\"StudentMotherId\" = \"Mother\".\"ParentId\"\
+LEFT JOIN \"ParentJob\" ON \"Mother\".\"ParentId\" = \"ParentJob\".\"ParentId\"\
+LEFT JOIN \"Job\" ON \"ParentJob\".\"ParentJobId\" = \"Job\".\"JobId\"\
+LEFT JOIN \"ParentPhone\" ON \"Mother\".\"ParentId\" = \"ParentPhone\".\"ParentId\"\
+WHERE \"Grade\".\"GradeId\" = " + gradeId + " \
+GROUP BY \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"Student\".\"StudentName\", \"Mother\".\"ParentName\",\
+         \"Mother\".\"ParentAcademicDegree\", \"Job\".\"JobName\", \"Student\".\"StudentFamilyStatus\",\
+         \"ParentPhone\".\"ParentPhoneNumber\", \"Student\".\"StudentAddress\"\
+  ";
+  const data = [];
+  return db.sequelize.query(query).then((students) => {
+    students[0].map((student) => {
+      const index = data.findIndex(s => s["StudentName"] === student["StudentName"]);
+      if (index === -1) {
+        data.push([
+          student["StudentName"],
+          student["ParentName"],
+          student["ParentAcademicDegree"],
+          student["JobName"] || "لا يوجد",
+          student["StudentFamilyStatus"],
+          student["ParentPhoneNumber"] || "لا يوجد",
+          student["StudentAddress"],
+        ]);
+      } else {
+        data[index] += `, ${student["ParentPhoneNumber"]}`;
+        data[student["GradeName"]].push(student);
+      }
+    });
+    return data;
+  });
+};
+
+const studentsAges = async (gradeId) => {
+  const query =
+    "\
+  SELECT \"Student\".\"StudentName\", \"Student\".\"StudentBirthDate\",\
+       age((date_part('year', now()) || '-10-01')::date, \"Student\".\"StudentBirthDate\"),\
+       \"Nationality\".\"NationalityName\", \"Responsible\".\"ParentName\", \"Job\".\"JobName\", \"Responsible\".\"ParentAddress\",\
+    \"Grade\".\"GradeName\"\
+  FROM \"Student\"\
+  JOIN \"Nationality\" ON \"Student\".\"StudentNationalityId\" = \"Nationality\".\"NationalityId\"\
+  JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
+  JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
+  JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+  JOIN \"Parent\" AS \"Responsible\" ON \"Student\".\"StudentResponsibleId\" = \"Responsible\".\"ParentId\"\
+  LEFT JOIN \"ParentJob\" ON \"Responsible\".\"ParentId\" = \"ParentJob\".\"ParentId\"\
+  LEFT JOIN \"Job\" ON \"ParentJob\".\"ParentJobId\" = \"Job\".\"JobId\"\
+  WHERE \"Grade\".\"GradeId\" = " + gradeId + " \
+  ORDER BY \"Grade\".\"GradeId\", \"Student\".\"StudentName\"\
+  ";
+  return db.sequelize.query(query).then((students) => {
+    return students[0].map((student) => {
+      let age = student["age"]["years"];
+      student["age"]["years"] > 10 ? age += " سنة" : age += " سنوات";
+      if (student["age"]["months"]) {
+        age += " و ";
+        switch (student["age"]["months"]) {
+        case 1:
+          age += "شهر";
+          break;
+        case 2:
+          age += "شهرين";
+          break;
+        case 11:
+          age += "11 شهر";
+          break;
+        default:
+          age += student["age"]["months"] + " أشهر";
+        }
+      }
+      if (student["age"]["days"]) {
+        age += " و ";
+        switch (student["age"]["days"]) {
+        case 1:
+          age += "يوم";
+          break;
+        case 2:
+          age += "يومين";
+          break;
+        default:
+          student["age"]["days"] < 11 ? age += " " + student["age"]["days"] + " أيام" : age += " " + student["age"]["days"] + " يوم";
+        }
+      }
+      return [
+        student["StudentName"],
+        student["StudentBirthDate"],
+        age,
+        student["NationalityName"],
+        student["ParentName"],
+        student["JobName"] || "لا يوجد",
+        student["ParentAddress"],
+        student["GradeName"],
+      ];
+    });
+  });
+};
+
 module.exports = {
   getSeatsData,
   // getCapacityStats,
@@ -482,4 +734,9 @@ module.exports = {
   getAbsenceRatioInAllGrades,
   getTransferredStudents,
   AbsentDays,
+  absenceSummary,
+  siblings,
+  classList,
+  motherData,
+  studentsAges,
 };

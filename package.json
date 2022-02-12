@@ -1,7 +1,7 @@
 {
   "name": "school-system",
   "productName": "school-system",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "My Electron application description",
   "repository": {
     "url": "https://github.com/zeyad-kay/school-system"
@@ -18,7 +18,8 @@
     "db:migrate": "sequelize-cli db:migrate",
     "db:seed:generate": "sequelize-cli seed:generate --name",
     "db:seed": "sequelize-cli db:seed:all",
-    "db:clean": "sequelize-cli db:migrate:undo:all"
+    "db:clean": "sequelize-cli db:migrate:undo:all",
+    "db:drop": "sequelize-cli db:drop"
   },
   "keywords": [],
   "author": "zeyad-kay",
@@ -35,7 +36,7 @@
       "publishers": [
         {
           "name": "@electron-forge/publisher-github",
-          "platforms":[
+          "platforms": [
             "win32"
           ],
           "config": {
@@ -66,13 +67,14 @@
     "dotenv": "^10.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.6.0",
+    "jsreport": "^2.11.0",
     "pg": "^8.7.1",
     "sequelize": "^6.6.5"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.59",
-    "@electron-forge/publisher-github": "^6.0.0-beta.61",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.59",
+    "@electron-forge/publisher-github": "^6.0.0-beta.61",
     "electron": "13.1.7",
     "eslint": "^7.32.0",
     "husky": "^7.0.1",

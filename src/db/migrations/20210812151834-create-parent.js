@@ -10,7 +10,6 @@ module.exports = {
         ParentNationalId: {
           type: Sequelize.STRING,
           unique: true,
-          allowNull: true,
         },
         ParentPassportId: {
           type: Sequelize.STRING,
@@ -39,7 +38,12 @@ module.exports = {
         ParentAcademicDegree: {
           type: Sequelize.ENUM,
           allowNull: false,
-          values: ["BACHELOR", "MASTERS", "PHD", "SECONDARY"]
+          values: ["بدون مؤهل","دبلوم","اعدادية","تعليم متوسط","تعليم عالي"]
+        },
+        IsDead : {
+          type : Sequelize.BOOLEAN,
+          defaultValue : false,
+          allowNull : false
         },
       }, { transaction: t });
       await queryInterface.addIndex("Parent", ["ParentName"], { transaction: t });
