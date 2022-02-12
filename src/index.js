@@ -17,6 +17,7 @@ const { absenceSummary, classList } = require("./reports/affairs");
 const fs = require("fs");
 const url = require("url");
 const { data } = require("jquery");
+const { Console } = require("console");
 let CWD = process.cwd();
 
 const rootDir = process.platform === "darwin" ? __dirname : CWD;
@@ -160,10 +161,19 @@ ipcMain.on("getAbsenceReport", async (err, { fromDate,
     r.push(value);
   }
   console.log(subHeaders);
-  renderReport({title,rows:r,subHeaders});
+  renderReport({title,rows:r,subHeaders},reportTypes.absence);
 });
-
-async function renderReport(data, ) {
+let reportTypes = {
+  absence : "0",
+  regular : "1"
+};
+ipcMain.on("printReport",(err,data) => {
+  renderReport(data,reportTypes.regular);
+  // renderReport
+});
+function toUpperCase(str) { return str.toUpperCase();}
+async function renderReport(data,reportType) {
+  console.log("here");
   try {
     // we defer jsreport initialization on first report render
     // to avoid slowing down the app at start time
@@ -174,11 +184,29 @@ async function renderReport(data, ) {
       let cur = __dirname.split("\\");
       cur.pop();
       cur = cur.join("\\");
+      let pth = "";
+      let headerPth = "";
+      if(reportType === reportTypes.absence){
+        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/PDFAbsenceReport.html")).toString();
+      }else {
+        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/regularReportTemplate.html")).toString();
+        headerPth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/HeaderTemplate.html")).toString();
+      }
+      console.log(headerPth);
       const resp = await jsreport.render({
         template: {
-          content: fs.readFileSync(path.join(__dirname, "./PDFAbsenceReport.html")).toString(),
+          content: pth,
+          helpers : "function isEqual(v1,v2,options) { if(v1 === v2) {return options.fn(this);} return options.inverse(this);}",
           engine: "handlebars",
-          recipe: "chrome-pdf"
+          recipe: "chrome-pdf",
+          chrome : {
+            "displayHeaderFooter" : true,
+            "headerTemplate" : headerPth,
+            "marginTop": "20px",
+            "marginRight": "20px",
+            "marginBottom": "20px",
+            "marginLeft": "20px"
+          }
         },
         data: {
           popper: cur + "/node_modules/@popperjs/core/dist/umd/popper.min.js",
@@ -705,6 +733,7 @@ ipcMain.on("login", function (event, args) {
       });
     } else {
       DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+      mainWindow.loadFile(path.join(__dirname, "views/login.html"));
     }
     break;
   case "2":

@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld("api", {
       "GenerateStudentsSeats",
       "render-report",
       "getAbsenceReport",
+      "printReport"
     ];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, data);

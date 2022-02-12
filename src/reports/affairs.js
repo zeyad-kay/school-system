@@ -582,7 +582,7 @@ JOIN \"Student\" ON \"Responsible\".\"ParentId\" = \"Student\".\"StudentResponsi
 GROUP BY \"Responsible\".\"ParentId\"\
 HAVING COUNT(\"Student\".\"StudentName\") = " +
     numOfSiblings +
-    ")";
+    ")" + "ORDER BY \"Responsible\".\"ParentName\"";
 
   return db.sequelize.query(query).then((students) => {
     return students[0].map((student) => {

@@ -20,17 +20,19 @@
     </section>
 
     <div class="row mt-5">
-      <button type="submit" class="col-6 btn btn-success text-center rounded-pill">
+      <button id="excelButton" type="submit" class="col-6 btn btn-success text-center rounded-pill">
         تحويل لملف اكسيل
       </button>
-      <button type="submit" class="col-6 btn btn-success text-center rounded-pill">
+      <button id="PrintButton" onclick="printReport()" class="col-6 btn btn-success text-center rounded-pill">
         طباعة
       </button>
     </div>
   </main>
 
   <script>
+    let GlobalData = {};
     window.api.receive("getReportDataFromMain", (data) => {
+      GlobalData = data;
       const h1 = document.querySelector("h1");
       const table = document.querySelector("table");
       const thead = document.createElement("thead");
@@ -66,13 +68,20 @@
   <script src="../../node_modules/datatables.net/js/jquery.dataTables.js"></script>
   <script src="js/lib/jquery.table2excel.min.js"></script>
   <script>
+    function printReport() {
+      window.api.send("printReport", {
+        rows: GlobalData["rows"],
+        subHeaders: GlobalData["headers"],
+        title: GlobalData["title"]
+      });
+    }
     $(document).ready(function () {
       $("#mytable").DataTable({
         searching: true,
-        ordering: true,
+        ordering: false,
       });
     });
-    $("button").click(function () {
+    $("#excelButton").click(function () {
       console.log("clicked");
       $("#mytable").table2excel({
         // exclude CSS class

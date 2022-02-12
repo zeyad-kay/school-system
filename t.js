@@ -73,7 +73,7 @@ const readFileAndGetStudents = async () => {
     return new Promise((res, rej) => {
         readFile("data/finalStudentData 2.csv", { encoding: 'utf-8' }, async (err, data) => {
             let students = [];
-            let lines = data.split("\r\n");
+            let lines = data.split("\n");
             let header = lines[0].split(";");
             for (let i = 1; i < lines.length; i++) {
                 let line = lines[i].split(";");
@@ -277,6 +277,6 @@ const dataBase = async () => {
     await dataBaseSetUp().catch(err => console.log("error"));
     // get students 
     let students = await readFileAndGetStudents();
-    addStudents(students);
+    await addStudents(students);
 };
 dataBase().then(res => console.log("data addes"));
