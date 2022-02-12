@@ -18,6 +18,7 @@ const fs = require("fs");
 const url = require("url");
 const { data } = require("jquery");
 const { Console } = require("console");
+const { getSeatsData } = require("./reports/affairs");
 let CWD = process.cwd();
 
 const rootDir = process.platform === "darwin" ? __dirname : CWD;
@@ -147,33 +148,33 @@ ipcMain.on("getAbsenceReport", async (err, { fromDate,
   GradeId,
   ClassId,
   absenceNumber, criteria }) => {
-  
+
   if (StageId === "0") StageId = null;
   if (GradeId === "0") GradeId = null;
   if (ClassId === "0") ClassId = null;
-  console.log({criteria});
-  let rows = await absenceSummary(fromDate,toDate,absenceNumber,StageId,GradeId,ClassId, criteria);
+  console.log({ criteria });
+  let rows = await absenceSummary(fromDate, toDate, absenceNumber, StageId, GradeId, ClassId, criteria);
   let title = "تقرير غياب";
   let r = [];
-  let subHeaders = []; 
-  for (let [key,value] of Object.entries(rows)) {
+  let subHeaders = [];
+  for (let [key, value] of Object.entries(rows)) {
     subHeaders.push(key);
     r.push(value);
   }
   console.log(subHeaders);
-  renderReport({title,rows:r,subHeaders},reportTypes.absence);
+  renderReport({ title, rows: r, subHeaders }, reportTypes.absence);
 });
 let reportTypes = {
-  absence : "0",
-  regular : "1"
+  absence: "0",
+  seats:"2",
+  regular: "1"
 };
-ipcMain.on("printReport",(err,data) => {
-  renderReport(data,reportTypes.regular);
+ipcMain.on("printReport", (err, data) => {
+  renderReport(data, reportTypes.regular);
   // renderReport
 });
-function toUpperCase(str) { return str.toUpperCase();}
-async function renderReport(data,reportType) {
-  console.log("here");
+
+async function renderReport(data, reportType) {
   try {
     // we defer jsreport initialization on first report render
     // to avoid slowing down the app at start time
@@ -185,27 +186,29 @@ async function renderReport(data,reportType) {
       cur.pop();
       cur = cur.join("\\");
       let pth = "";
-      let headerPth = "";
-      if(reportType === reportTypes.absence){
+      if (reportType === reportTypes.absence) {
         pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/PDFAbsenceReport.html")).toString();
-      }else {
-        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/regularReportTemplate.html")).toString();
-        headerPth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/HeaderTemplate.html")).toString();
+      }else if(reportType === reportTypes.seats){
+        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/SeatNumberCard.html")).toString();
       }
-      console.log(headerPth);
+      else {
+        pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/regularReportTemplate.html")).toString();
+      }
       const resp = await jsreport.render({
         template: {
           content: pth,
-          helpers : "function isEqual(v1,v2,options) { if(v1 === v2) {return options.fn(this);} return options.inverse(this);}",
+          helpers: "function isEqual(v1,v2,options) { if(v1 === v2) {return options.fn(this);} return options.inverse(this);}",
           engine: "handlebars",
           recipe: "chrome-pdf",
-          chrome : {
-            "displayHeaderFooter" : true,
-            "headerTemplate" : headerPth,
+          chrome: {
+            "displayHeaderFooter": true,
+            "landscape" : reportType === reportTypes.seats ? true : false,
+            "format" : "A4",
             "marginTop": "20px",
             "marginRight": "20px",
             "marginBottom": "20px",
-            "marginLeft": "20px"
+            "marginLeft": "20px",
+            "scale" : reportType === reportTypes.seats ? 0.6 : 1
           }
         },
         data: {
@@ -214,8 +217,12 @@ async function renderReport(data,reportType) {
           bootstrapcss: cur + "/node_modules/bootstrap/dist/css/bootstrap.min.css",
           logo: cur + "/src/assets/images/index.png",
           rows: data.rows,
-          subHeaders : data.subHeaders,
-          title : data.title
+          subHeaders: data.subHeaders,
+          title: data.title,
+          stageName : data.stageName,
+          gradeName : data.gradeName,
+          yearStart : data.yearStart,
+          yearEnd : data.yearEnd
         }
       });
 
@@ -385,15 +392,13 @@ ipcMain.on("addAbsentType", (err, AbsentReasonName) => {
 // Generate Students Seats 
 ipcMain.on("GenerateStudentsSeats", function (err, { gradeId, seatStart, seatStep }) {
   seats.generateStudentSeats(gradeId, seatStart, seatStep).then((results) => {
-    console.log(results);
-    DialogBox(["تم توليد الأرقام الجلوس"], "info", "تم");
   }).catch(err => {
     console.log(err);
     DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
   });
 });
 // ipcMain.on("render-pdf-report", () = {
-  
+
 // })
 // get essintial Data
 ipcMain.on("getEssentialData", function (err, destination) {
@@ -721,35 +726,35 @@ ipcMain.on("login", function (event, args) {
   mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   // load Students
   switch (args[0]) {
-  case "1":
-    if (args[1] === "1234") {
-      CurrentWindow = "expenses";
-      getEssentialData().then((data) => {
-        mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
-        ipcMain.on("ScriptLoaded", function cb() {
-          mainWindow.webContents.send("sentEssentialData", data);
-          ipcMain.removeListener("ScriptLoaded", cb);
+    case "1":
+      if (args[1] === "1234") {
+        CurrentWindow = "expenses";
+        getEssentialData().then((data) => {
+          mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
+          ipcMain.on("ScriptLoaded", function cb() {
+            mainWindow.webContents.send("sentEssentialData", data);
+            ipcMain.removeListener("ScriptLoaded", cb);
+          });
         });
-      });
-    } else {
-      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-      mainWindow.loadFile(path.join(__dirname, "views/login.html"));
-    }
-    break;
-  case "2":
-    if (args[1] === "2468") {
-      CurrentWindow = "affairs";
-      getEssentialData().then((data) => {
-        console.log(data);
-        mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
-        ipcMain.on("ScriptLoaded", function cb() {
-          mainWindow.webContents.send("sentEssentialData", data);
-          ipcMain.removeListener("ScriptLoaded", cb);
+      } else {
+        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+        mainWindow.loadFile(path.join(__dirname, "views/login.html"));
+      }
+      break;
+    case "2":
+      if (args[1] === "2468") {
+        CurrentWindow = "affairs";
+        getEssentialData().then((data) => {
+          console.log(data);
+          mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
+          ipcMain.on("ScriptLoaded", function cb() {
+            mainWindow.webContents.send("sentEssentialData", data);
+            ipcMain.removeListener("ScriptLoaded", cb);
+          });
         });
-      });
-    } else {
-      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-    };
+      } else {
+        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+      };
   }
 });
 ipcMain.on("sendStudentIdToMain", (err, studentId) => {
@@ -800,6 +805,19 @@ ipcMain.on("receiveWarning", (err, { StudentId, WarningDate }) => {
       console.log(err);
       DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
     });
+});
+ipcMain.on("generateStudentsCards", (err, { gradeId, gradeName, stageName,yearStart,yearEnd }) => {
+  // console.log(gradeId,gradeName,stageName);
+  getSeatsData(gradeId).then(data => {
+    let d = {
+      rows : data,
+      gradeName,
+      stageName,
+      yearStart,
+      yearEnd
+    }
+    renderReport(d,reportTypes.seats);
+  });
 });
 ipcMain.on("sendAffairsReportData", (err, args) => {
   // load screen
