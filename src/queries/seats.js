@@ -61,8 +61,9 @@ const getStudentSeat = async (StudentId) => {
     })
     .then((res) => res.toJSON());
 };
+
 module.exports = {
   generateStudentSeats,
   getStudentSeat,
-  studentsInGrade,
+  studentsInGrade
 };

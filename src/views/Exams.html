@@ -116,8 +116,7 @@
         });
         return ;
       }
-      window.api.send("GenerateStudentsSeats",{gradeId,seatStart,seatStep});
-      window.api.send("generateStudentsCards",{gradeId,gradeName,stageName,yearStart,yearEnd});
+      window.api.send("generateStudentsCards",{gradeId,gradeName,stageName,yearStart,yearEnd,seatStart,seatStep});
     }
     function GenerateStudentsSeats() {
       let gradeId = document.getElementById("GradesList").value;
@@ -138,8 +137,7 @@
         });
         return ;
       }
-      window.api.send("GenerateStudentsSeats",{gradeId,seatStart,seatStep});
-      window.api.send("sendAffairsReportData", ["Seats", [gradeId]]);
+      window.api.send("sendAffairsReportData", ["Seats", [gradeId,seatStart,seatStep]]);
     }
     window.api.receive("sentEssentialData", (grades) => {
       const GradesList = document.getElementById("GradesList");
