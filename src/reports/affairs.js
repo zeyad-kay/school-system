@@ -1,9 +1,10 @@
-const { studentsInGrade } = require("../queries/seats");
+const { generateStudentSeats } = require("../queries/seats");
 // const { getClasses } = require("../queries/class");
 const { getAbsenceBetween } = require("../queries/absent");
 const { getGrades } = require("../queries/grade");
 const db = require("../db/models");
 const { Op } = require("sequelize");
+const { mapToJSON } = require("../queries/utlis");
 
 const dateDiffIndays = (date1, date2) => {
   const dt1 = new Date(date1);
@@ -17,32 +18,22 @@ const dateDiffIndays = (date1, date2) => {
   );
 };
 
-const getSeatsData = async (gradeId) => {
-  const { students, count } = await studentsInGrade(gradeId);
-
-  return db["StudentSeat"]
-    .findAll({
-      where: {
-        StudentId: {
-          [Op.between]: [students[0].StudentId, students[count - 1].StudentId],
-        },
+const getSeatsData = async (gradeId,seatStart,seatStep) => {
+  return generateStudentSeats(gradeId,seatStart,seatStep).then(async (stdIdsSeats) => {
+    let studentsIds = stdIdsSeats.map(std => std.StudentId);
+    let stdsNames = await db["Student"].findAll({
+      attributes : ["StudentName"],
+      where : {
+        StudentId : {
+          [Op.in] : studentsIds
+        }
       },
-      required: true,
-      include: {
-        model: db["Student"],
-        required: true,
-        attributes: ["StudentId", "StudentName"],
-      },
-      order: [["SeatNumber", "ASC"]],
-    })
-    .then((students) => students.map((student) => student.toJSON()))
-    .then((results) => {
-      return results.map((result) => [
-        result.SeatNumber,
-        result.Student.StudentName,
-      ]);
-    });
-};
+      order: [["StudentName", "ASC"]]
+    }).then(mapToJSON);
+      // map
+    return stdsNames.map((std,i) => [stdIdsSeats[i].SeatNumber,std.StudentName]);
+  });
+}
 
 // const getClassStats = async (classId) => {
 //   return db["StudentClass"].count({ where: { ClassId: classId } });

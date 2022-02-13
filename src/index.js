@@ -16,9 +16,10 @@ const seats = require("./queries/seats");
 const { absenceSummary, classList } = require("./reports/affairs");
 const fs = require("fs");
 const url = require("url");
-const { data } = require("jquery");
+const { data, map } = require("jquery");
 const { Console } = require("console");
 const { getSeatsData } = require("./reports/affairs");
+const { end } = require("@popperjs/core");
 let CWD = process.cwd();
 
 const rootDir = process.platform === "darwin" ? __dirname : CWD;
@@ -212,9 +213,6 @@ async function renderReport(data, reportType) {
           }
         },
         data: {
-          popper: cur + "/node_modules/@popperjs/core/dist/umd/popper.min.js",
-          bootstrapjs: cur + "/node_modules/bootstrap/dist/js/bootstrap.min.js",
-          bootstrapcss: cur + "/node_modules/bootstrap/dist/css/bootstrap.min.css",
           logo: cur + "/src/assets/images/index.png",
           rows: data.rows,
           subHeaders: data.subHeaders,
@@ -389,14 +387,7 @@ ipcMain.on("addAbsentType", (err, AbsentReasonName) => {
       DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
     });
 });
-// Generate Students Seats 
-ipcMain.on("GenerateStudentsSeats", function (err, { gradeId, seatStart, seatStep }) {
-  seats.generateStudentSeats(gradeId, seatStart, seatStep).then((results) => {
-  }).catch(err => {
-    console.log(err);
-    DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
-  });
-});
+
 // ipcMain.on("render-pdf-report", () = {
 
 // })
@@ -723,11 +714,11 @@ ipcMain.on(
 let CurrentWindow = null;
 ipcMain.on("login", function (event, args) {
   console.log(args[0], args[1]);
-  mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   // load Students
   switch (args[0]) {
     case "1":
       if (args[1] === "1234") {
+        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
         CurrentWindow = "expenses";
         getEssentialData().then((data) => {
           mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
@@ -738,11 +729,11 @@ ipcMain.on("login", function (event, args) {
         });
       } else {
         DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-        mainWindow.loadFile(path.join(__dirname, "views/login.html"));
       }
       break;
     case "2":
       if (args[1] === "2468") {
+        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
         CurrentWindow = "affairs";
         getEssentialData().then((data) => {
           console.log(data);
@@ -806,18 +797,20 @@ ipcMain.on("receiveWarning", (err, { StudentId, WarningDate }) => {
       DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
     });
 });
-ipcMain.on("generateStudentsCards", (err, { gradeId, gradeName, stageName,yearStart,yearEnd }) => {
-  // console.log(gradeId,gradeName,stageName);
-  getSeatsData(gradeId).then(data => {
-    let d = {
-      rows : data,
-      gradeName,
-      stageName,
-      yearStart,
-      yearEnd
-    }
-    renderReport(d,reportTypes.seats);
-  });
+ipcMain.on("generateStudentsCards", async (err, { gradeId, gradeName, stageName,yearStart,yearEnd,seatStart,seatStep}) => {
+      getSeatsData(gradeId,seatStart,seatStep).then(finalSeats => {
+        let d = {
+          rows : finalSeats,
+          gradeName,
+          stageName,
+          yearStart,
+          yearEnd
+        }
+        renderReport(d,reportTypes.seats);
+      }).catch((err) => {
+      DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
+      console.error(err);
+    });
 });
 ipcMain.on("sendAffairsReportData", (err, args) => {
   // load screen
