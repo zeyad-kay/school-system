@@ -91,3 +91,5 @@ out/
 
 # Editor
 .vscode
+
+*.pdf
