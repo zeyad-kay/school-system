@@ -212,9 +212,6 @@ async function renderReport(data, reportType) {
           }
         },
         data: {
-          popper: cur + "/node_modules/@popperjs/core/dist/umd/popper.min.js",
-          bootstrapjs: cur + "/node_modules/bootstrap/dist/js/bootstrap.min.js",
-          bootstrapcss: cur + "/node_modules/bootstrap/dist/css/bootstrap.min.css",
           logo: cur + "/src/assets/images/index.png",
           rows: data.rows,
           subHeaders: data.subHeaders,
@@ -723,11 +720,11 @@ ipcMain.on(
 let CurrentWindow = null;
 ipcMain.on("login", function (event, args) {
   console.log(args[0], args[1]);
-  mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   // load Students
   switch (args[0]) {
     case "1":
       if (args[1] === "1234") {
+        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
         CurrentWindow = "expenses";
         getEssentialData().then((data) => {
           mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
@@ -738,11 +735,11 @@ ipcMain.on("login", function (event, args) {
         });
       } else {
         DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-        mainWindow.loadFile(path.join(__dirname, "views/login.html"));
       }
       break;
     case "2":
       if (args[1] === "2468") {
+        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
         CurrentWindow = "affairs";
         getEssentialData().then((data) => {
           console.log(data);
