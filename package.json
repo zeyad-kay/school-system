@@ -30,8 +30,7 @@
         "ignore": [
           "src/db/seeders/*",
           "src/db/migrations/*"
-        ],
-        "asar": true
+        ]
       },
       "publishers": [
         {
