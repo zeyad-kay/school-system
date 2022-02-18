@@ -12,14 +12,10 @@ const installment = require("./queries/installment");
 const { StartNewYear } = require("./queries/newYear");
 const reports = require("./reports/reports");
 const Bus = require("./queries/BusRoutes");
-const seats = require("./queries/seats");
-const { absenceSummary, classList } = require("./reports/affairs");
+const { absenceSummary } = require("./reports/affairs");
 const fs = require("fs");
 const url = require("url");
-const { data, map } = require("jquery");
-const { Console } = require("console");
 const { getSeatsData } = require("./reports/affairs");
-const { end } = require("@popperjs/core");
 let CWD = process.cwd();
 
 const rootDir = process.platform === "darwin" ? __dirname : CWD;
@@ -34,7 +30,7 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 let mainWindow;
-const createWindow = () => {
+const createWindow = async () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1920,
@@ -46,6 +42,8 @@ const createWindow = () => {
       preload: path.join(__dirname, "views/js/preload.js"),
     },
   });
+
+  await jsreport.init();
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "views/login.html"));
@@ -153,7 +151,6 @@ ipcMain.on("getAbsenceReport", async (err, { fromDate,
   if (StageId === "0") StageId = null;
   if (GradeId === "0") GradeId = null;
   if (ClassId === "0") ClassId = null;
-  console.log({ criteria });
   let rows = await absenceSummary(fromDate, toDate, absenceNumber, StageId, GradeId, ClassId, criteria);
   let title = "تقرير غياب";
   let r = [];
@@ -162,7 +159,7 @@ ipcMain.on("getAbsenceReport", async (err, { fromDate,
     subHeaders.push(key);
     r.push(value);
   }
-  console.log(subHeaders);
+  (subHeaders);
   renderReport({ title, rows: r, subHeaders }, reportTypes.absence);
 });
 let reportTypes = {
@@ -177,8 +174,8 @@ ipcMain.on("printReport", (err, data) => {
 
 async function renderReport(data, reportType) {
   try {
-    // we defer jsreport initialization on first report render
-    // to avoid slowing down the app at start time
+    // check if it is not initialized
+    // incase it didn't start properly on start
     if (!jsreport._initialized) {
       await jsreport.init();
     }
@@ -446,7 +443,6 @@ ipcMain.on("getEssentialData", function (err, destination) {
   } else {
     // get all stages , grades and classes
     getEssentialData().then((data) => {
-      console.log(data.stagesData.Grades);
       if (destination === "addStudent") {
         mainWindow.loadFile(path.join(__dirname, "views/addNewStudent.html"));
         ipcMain.on("ScriptLoaded", function cb() {
@@ -656,8 +652,6 @@ ipcMain.on(
   function (err, { studentId, studentData, fatherData, motherData, resData }) {
     mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
     //update student
-    // console.log(studentData);
-    console.log(fatherData);
     student
       .updateStudentByStudentId(
         studentId,
@@ -713,39 +707,37 @@ ipcMain.on(
 // code. You can also put them in separate files and import them here.
 let CurrentWindow = null;
 ipcMain.on("login", function (event, args) {
-  console.log(args[0], args[1]);
   // load Students
   switch (args[0]) {
-    case "1":
-      if (args[1] === "1234") {
-        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
-        CurrentWindow = "expenses";
-        getEssentialData().then((data) => {
-          mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
-          ipcMain.on("ScriptLoaded", function cb() {
-            mainWindow.webContents.send("sentEssentialData", data);
-            ipcMain.removeListener("ScriptLoaded", cb);
-          });
+  case "1":
+    if (args[1] === "1234") {
+      mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+      CurrentWindow = "expenses";
+      getEssentialData().then((data) => {
+        mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
+        ipcMain.on("ScriptLoaded", function cb() {
+          mainWindow.webContents.send("sentEssentialData", data);
+          ipcMain.removeListener("ScriptLoaded", cb);
         });
-      } else {
-        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-      }
-      break;
-    case "2":
-      if (args[1] === "2468") {
-        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
-        CurrentWindow = "affairs";
-        getEssentialData().then((data) => {
-          console.log(data);
-          mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
-          ipcMain.on("ScriptLoaded", function cb() {
-            mainWindow.webContents.send("sentEssentialData", data);
-            ipcMain.removeListener("ScriptLoaded", cb);
-          });
+      });
+    } else {
+      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+    }
+    break;
+  case "2":
+    if (args[1] === "2468") {
+      mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+      CurrentWindow = "affairs";
+      getEssentialData().then((data) => {
+        mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
+        ipcMain.on("ScriptLoaded", function cb() {
+          mainWindow.webContents.send("sentEssentialData", data);
+          ipcMain.removeListener("ScriptLoaded", cb);
         });
-      } else {
-        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-      };
+      });
+    } else {
+      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+    }
   }
 });
 ipcMain.on("sendStudentIdToMain", (err, studentId) => {
@@ -798,19 +790,19 @@ ipcMain.on("receiveWarning", (err, { StudentId, WarningDate }) => {
     });
 });
 ipcMain.on("generateStudentsCards", async (err, { gradeId, gradeName, stageName,yearStart,yearEnd,seatStart,seatStep}) => {
-      getSeatsData(gradeId,seatStart,seatStep).then(finalSeats => {
-        let d = {
-          rows : finalSeats,
-          gradeName,
-          stageName,
-          yearStart,
-          yearEnd
-        }
-        renderReport(d,reportTypes.seats);
-      }).catch((err) => {
-      DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
-      console.error(err);
-    });
+  getSeatsData(gradeId,seatStart,seatStep).then(finalSeats => {
+    let d = {
+      rows: finalSeats,
+      gradeName,
+      stageName,
+      yearStart,
+      yearEnd
+    };
+    renderReport(d,reportTypes.seats);
+  }).catch((err) => {
+    DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
+    console.error(err);
+  });
 });
 ipcMain.on("sendAffairsReportData", (err, args) => {
   // load screen

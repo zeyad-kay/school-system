@@ -46,7 +46,6 @@
       });
       tableHeader += `</tr>`;
       thead.innerHTML = tableHeader;
-      console.log(tableHeader);
       let tableData = "";
       data["rows"].forEach((row) => {
         tableData += `<tr>`;
@@ -82,7 +81,6 @@
       });
     });
     $("#excelButton").click(function () {
-      console.log("clicked");
       $("#mytable").table2excel({
         // exclude CSS class
         exclude: ".noExl",

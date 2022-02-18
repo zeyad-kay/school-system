@@ -119,7 +119,6 @@
             const condition = document.getElementById("condition");
             const criteria = document.getElementById("criteria").value;
             let errors = [];
-            console.log("Before");
             if (!fromDate || !toDate) {
                 errors.push("من فضلك ادخل التواريخ")
             }
@@ -128,7 +127,6 @@
             }
 
             if (errors.length === 0) {
-                console.log("all good");
                 window.api.send("getAbsenceReport", {
                     fromDate,
                     toDate,
@@ -139,7 +137,6 @@
                     criteria
                 });
             } else {
-                console.log("shit");
                 window.api.send("ShowDialogBox", {
                     messages: errors,
                     type: "error",
@@ -153,8 +150,6 @@
             const StageList = document.getElementById("StageList");
             const GradeList = document.getElementById("GradeList");
             const ClassList = document.getElementById("ClassList");
-            console.log();
-            //console.log(StageList);
             stagesData.forEach((stage) => {
                 const option = document.createElement("option");
                 option.setAttribute("value", stage.StageId);

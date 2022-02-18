@@ -1,3 +1,4 @@
+/* eslint-disable */
 const db = require("./src/db/models/index");
 const { Op } = require("sequelize");
 const { addNewStudent } = require("./src/queries/students")
