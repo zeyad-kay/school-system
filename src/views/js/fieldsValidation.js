@@ -4,6 +4,8 @@ const checkStudentData = () => {
   let StudentNationalId = document.getElementById("StudentNationalId").value;
   let StudentPassportId = document.getElementById("StudentPassportId").value;
   let StudentBirthDate = document.getElementById("StudentBirthDate").value;
+  let StudentBirthPlace = document.getElementById("StudentBirthPlace").value;
+  let StudentBirthGovernorate = document.getElementById("StudentBirthGovernorate").value;
   let StudentRegisterDate = document.getElementById(
     "StudentRegisterDate",
   ).value;
@@ -25,6 +27,8 @@ const checkStudentData = () => {
     StudentName.length === 0 ||
     StudentBirthDate.length === 0 ||
     StudentAddress.length === 0 ||
+    StudentBirthPlace.length === 0 ||
+    StudentBirthGovernorate.length === 0 ||
     !StudentNationalityId ||
     !StudentSex ||
     !StudentSiblingOrder ||
@@ -52,6 +56,8 @@ const checkStudentData = () => {
           StudentNationalId,
           StudentPassportId,
           StudentBirthDate,
+          StudentBirthPlace,
+          StudentBirthGovernorate,
           StudentRegisterDate,
           StudentAddress,
           StudentNationalityId,
