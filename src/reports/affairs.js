@@ -485,9 +485,9 @@ const absenceSummary = async (
   JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"\
   JOIN \"Parent\" As \"Responsible\" ON \"Student\".\"StudentResponsibleId\" = \"Responsible\".\"ParentId\"\
   JOIN \"ParentPhone\" ON \"Responsible\".\"ParentId\" = \"ParentPhone\".\"ParentId\"\
-  WHERE \"AbsentDate\" > '" +
+  WHERE \"AbsentDate\" BETWEEN '" +
     startingDate +
-    "' AND \"AbsentDate\" < '" +
+    "' AND '" +
     endingDate +
     "'";
   if (classId) {

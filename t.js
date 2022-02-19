@@ -265,13 +265,13 @@ const addStudents = async (students) => {
     return 1;
 };
 const getBirthDate = (national_id) => {
-    let year = "20" + national_id.substr(1, 2);
-    let mouth = national_id.substr(3, 2);
-    let day = national_id.substr(5, 2);
-    let birthDate = new Date(year, mouth, day);
+    let year = Number("20" + national_id.substr(1, 2));
+    let mouth = Number(national_id.substr(3, 2));
+    let day = Number(national_id.substr(5, 2));
+    let birthDate = new Date(year, mouth - 1, day);
     birthDate = birthDate.toISOString();
     return birthDate
-}
+  }
 const dataBase = async () => {
     // data base set up 
     await dataBaseSetUp().catch(err => console.log("error"));
@@ -279,4 +279,4 @@ const dataBase = async () => {
     let students = await readFileAndGetStudents();
     await addStudents(students);
 };
-dataBase().then(res => console.log("data addes"));
+dataBase().then(res => console.log("data added"));
