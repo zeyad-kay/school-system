@@ -33,7 +33,8 @@ const updateParentById = async (ParentId, newParentData, t) => {
     await db["ParentJob"].create({
       ParentId,
       ParentJobId: job.ParentJobId,
-      ParentJobAddress: job.ParentJobAddress
+      ParentJobAddress: job.ParentJobAddress,
+      ParentJobDescription:job.ParentJobDesc
     }, {
       transaction: t
     });
@@ -68,14 +69,14 @@ const getParentById = async (ParentId) => {
     attributes: ["JobName"],
     include: {
       model: db["ParentJob"],
-      attributes: ["ParentJobId", "ParentJobAddress"],
+      attributes: ["ParentJobId", "ParentJobAddress","ParentJobDescription"],
       where: {
         ParentId
       }
     }
   });
   parentJobs = mapToJSON(parentJobs).map(el => {
-    return { JobName: el.JobName, JobId: el.ParentJobs[0].ParentJobId, JobAddress: el.ParentJobs[0].ParentJobAddress };
+    return { JobName: el.JobName, JobId: el.ParentJobs[0].ParentJobId, JobAddress: el.ParentJobs[0].ParentJobAddress,ParentJobDescription: el.ParentJobs[0].ParentJobDescription};
   });
   return {
     ...parentData,
@@ -121,7 +122,8 @@ const addParent = async (parentData,t) => {
     parentData.jobs.forEach(async (job) => {
       await parent.createParentJob({
         ParentJobId: job.ParentJobId,
-        ParentJobAddress: job.ParentJobAddress
+        ParentJobAddress: job.ParentJobAddress,
+        ParentJobDescription:job.ParentJobDesc
       }, { transaction: t });
     });
   }

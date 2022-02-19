@@ -88,6 +88,12 @@ const readFileAndGetStudents = async () => {
       let fatherJobs = students.map(std => std['Table1.father_job']);
       let motherJobs = students.map(std => std['Table1.mother_job']);
       let jobs = new Set(fatherJobs.concat(motherJobs));
+      finalJobs.push({
+        JobName: "عامل بمعهد البنين"
+      });
+      finalJobs.push({
+        JobName: "عامل بمعهد البنات"
+      });
       jobs.forEach(job => {
         if (job) {
           finalJobs.push({

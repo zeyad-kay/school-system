@@ -558,7 +558,7 @@
   function removeDiv(devId) {
     document.getElementById(devId).remove();
   }
-  function addWorkToDiv(divId, JobId = 1, JobAddress = "", addRemove = true) {
+  function addWorkToDiv(divId, JobId = 1, JobAddress = "", JobDesc = "",addRemove = true) {
     let ID = Math.floor(Math.random() * (20000 - 500)) + 500;
     const dadJobArea = document.getElementById(divId);
     const wrapperDiv = document.createElement("div");
@@ -566,7 +566,7 @@
     wrapperDiv.setAttribute("dir", "rtl");
     wrapperDiv.setAttribute("id", "delete-" + String(ID));
     const dadWorkTitle = document.createElement("div");
-    dadWorkTitle.classList.add("col-12", "col-md-4");
+    dadWorkTitle.classList.add("col-12", "col-md-3");
     const dadWorkSelect = document.createElement("select");
     dadWorkSelect.classList.add("form-select");
     dadWorkSelect.setAttribute("aria-label", "Default select example");
@@ -580,7 +580,7 @@
     dadWorkTitle.appendChild(dadWorkSelect);
     wrapperDiv.appendChild(dadWorkTitle);
     const dadWorkAdress = document.createElement("div");
-    dadWorkAdress.classList.add("col-12", "col-md-4");
+    dadWorkAdress.classList.add("col-12", "col-md-3");
     const dadWorkAdressInner = document.createElement("div");
     dadWorkAdressInner.classList.add(
       "input-group",
@@ -599,8 +599,30 @@
     dadWorkAdressInner.appendChild(dadWorkAdressInnerInput);
     dadWorkAdress.appendChild(dadWorkAdressInner);
     wrapperDiv.appendChild(dadWorkAdress);
+
+    const dadWorkDisc = document.createElement("div");
+    dadWorkDisc.classList.add("col-12", "col-md-3");
+    const dadWorkDiscInner = document.createElement("div");
+    dadWorkDiscInner.classList.add(
+      "input-group",
+      "input-group",
+      "mb-2",
+      "col"
+    );
+    const dadWorkDiscInnerLabel = document.createElement("span");
+    dadWorkDiscInnerLabel.classList.add("input-group-text");
+    dadWorkDiscInnerLabel.innerText = "وصف للعمل :";
+    dadWorkDiscInner.appendChild(dadWorkDiscInnerLabel);
+    const dadWorkDiscInnerInput = document.createElement("input");
+    dadWorkDiscInnerInput.classList.add("form-control");
+    dadWorkDiscInnerInput.setAttribute("type", "text");
+    dadWorkDiscInnerInput.value = JobDesc;
+    dadWorkDiscInner.appendChild(dadWorkDiscInnerInput);
+    dadWorkDisc.appendChild(dadWorkDiscInner);
+    wrapperDiv.appendChild(dadWorkDisc);
+    
     const addButtonDiv = document.createElement("div");
-    addButtonDiv.classList.add("col-12", "col-md-4");
+    addButtonDiv.classList.add("col-12", "col-md-3");
     const addButtonDivButton = document.createElement("button");
     addButtonDivButton.classList.add("btn", "btn-primary");
     addButtonDivButton.setAttribute(
@@ -689,9 +711,9 @@
     loadSideBar(data.students);
     ReportsNav(data);
     jobs = data.jobs;
-    addWorkToDiv("DadworkArea", 1, "", false);
-    addWorkToDiv("MomWorkArea", 1, "", false);
-    addWorkToDiv("ResWorkArea", 1, "", false);
+    addWorkToDiv("DadworkArea", 1, "", "",false);
+    addWorkToDiv("MomWorkArea", 1, "", "",false);
+    addWorkToDiv("ResWorkArea", 1, "", "",false);
     addNewPhone("dadphoneArea", "", false);
     addNewPhone("MomPhoneArea", "", false);
     addNewPhone("ResPhoneArea", "", false);

@@ -106,10 +106,11 @@ const checkFatherData = () => {
     const childs = DadworkAreaChilds[i].children;
     let ParentJobId = childs[0].children[0].value;
     let ParentJobAddress = childs[1].children[0].children[1].value;
-    if (ParentJobAddress === "") continue;
+    let ParentJobDesc = childs[2].children[0].children[1].value;
     jobs.push({
       ParentJobId,
       ParentJobAddress,
+      ParentJobDesc
     });
   }
   if (jobs.length === 0) {
@@ -182,10 +183,12 @@ const checkMotherData = () => {
     const childs = MomWorkAreaChilds[i].children;
     let ParentJobId = childs[0].children[0].value;
     let ParentJobAddress = childs[1].children[0].children[1].value;
-    if (ParentJobAddress === "") continue;
+    let ParentJobDesc = childs[2].children[0].children[1].value;
+    console.log(ParentJobDesc);
     jobs.push({
       ParentJobId,
       ParentJobAddress,
+      ParentJobDesc
     });
   }
   if (jobs.length === 0) {

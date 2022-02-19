@@ -20,8 +20,10 @@ module.exports = {
         },
         ParentJobAddress: {
           type: Sequelize.STRING,
-          allowNull: false
         },
+        ParentJobDescription: {
+          type: Sequelize.STRING,
+        }
       }, { transaction: t });
       await queryInterface.addIndex("ParentJob", ["ParentJobId","ParentId"], {
         unique: true,

@@ -169,8 +169,8 @@
 
   <!--start of side bar-->
   <aside>
-    <div class="offcanvas offcanvas-start container sidebar-nav me-auto" style="padding: 0px 5px;" data-bs-scroll="true" data-bs-backdrop="false"
-      tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+    <div class="offcanvas offcanvas-start container sidebar-nav me-auto" style="padding: 0px 5px;" data-bs-scroll="true"
+      data-bs-backdrop="false" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
       <div class="offcanvas-header justify-content-center">
         <button type="button" class="btn-close btn-close-white d-md-none me-auto text-reset" data-bs-dismiss="offcanvas"
           aria-label="Close"></button>
@@ -695,12 +695,7 @@
     function removeDiv(devId) {
       document.getElementById(devId).remove();
     }
-    function addWorkToDiv(
-      divId,
-      JobId = 1,
-      JobAddress = "",
-      addRemove = true
-    ) {
+    function addWorkToDiv(divId,JobId = 1,JobAddress = "",JobDesc = "",addRemove = true) {
       let ID = Math.floor(Math.random() * (20000 - 500)) + 500;
       const dadJobArea = document.getElementById(divId);
       const wrapperDiv = document.createElement("div");
@@ -741,6 +736,28 @@
       dadWorkAdressInner.appendChild(dadWorkAdressInnerInput);
       dadWorkAdress.appendChild(dadWorkAdressInner);
       wrapperDiv.appendChild(dadWorkAdress);
+
+      const dadWorkDisc = document.createElement("div");
+      dadWorkDisc.classList.add("col-12", "col-md-3");
+      const dadWorkDiscInner = document.createElement("div");
+      dadWorkDiscInner.classList.add(
+        "input-group",
+        "input-group",
+        "mb-2",
+        "col"
+      );
+      const dadWorkDiscInnerLabel = document.createElement("span");
+      dadWorkDiscInnerLabel.classList.add("input-group-text");
+      dadWorkDiscInnerLabel.innerText = "وصف للعمل :";
+      dadWorkDiscInner.appendChild(dadWorkDiscInnerLabel);
+      const dadWorkDiscInnerInput = document.createElement("input");
+      dadWorkDiscInnerInput.classList.add("form-control");
+      dadWorkDiscInnerInput.setAttribute("type", "text");
+      dadWorkDiscInnerInput.value = JobDesc;
+      dadWorkDiscInner.appendChild(dadWorkDiscInnerInput);
+      dadWorkDisc.appendChild(dadWorkDiscInner);
+      wrapperDiv.appendChild(dadWorkDisc);
+
       const addButtonDiv = document.createElement("div");
       addButtonDiv.classList.add("col-12", "col-md-4");
       const addButtonDivButton = document.createElement("button");
@@ -1025,7 +1042,7 @@
         DeadDadTrigger.checked = true;
         DeadDadTrigger.dispatchEvent(new Event("change"));
         addNewPhone("dadphoneArea", "", false);
-        addWorkToDiv("DadworkArea", "", false);
+        addWorkToDiv("DadworkArea", "","", false);
       } else {
         document
           .getElementById("DadName")
@@ -1047,12 +1064,13 @@
           fatherData.IsDead;
         // hundle job data
         let dadJobs = fatherData.jobs;
+        console.log(dadJobs);
         const dadJobArea = document.getElementById("DadworkArea");
         dadJobs.forEach((job, i) => {
           if (i === 0) {
-            addWorkToDiv("DadworkArea", job.JobId, job.JobAddress, false);
+            addWorkToDiv("DadworkArea", job.JobId, job.JobAddress, job.ParentJobDescription,false);
           } else {
-            addWorkToDiv("DadworkArea", job.JobId, job.JobAddress);
+            addWorkToDiv("DadworkArea", job.JobId, job.JobAddress,job.ParentJobDescription);
           }
         });
         // hundle dad phones
@@ -1070,7 +1088,7 @@
         DeadMomTrigger.checked = true;
         DeadMomTrigger.dispatchEvent(new Event("change"));
         addNewPhone("MomPhoneArea", "", false);
-        addWorkToDiv("MomWorkArea", 1, "", false);
+        addWorkToDiv("MomWorkArea", 1, "", "",false);
       } else {
         document
           .getElementById("MomName")
@@ -1095,9 +1113,9 @@
         let momJobs = motherData.jobs;
         momJobs.forEach((job, i) => {
           if (i === 0) {
-            addWorkToDiv("MomWorkArea", job.JobId, job.JobAddress, false);
+            addWorkToDiv("MomWorkArea", job.JobId, job.JobAddress,job.ParentJobDescription,false);
           } else {
-            addWorkToDiv("MomWorkArea", job.JobId, job.JobAddress);
+            addWorkToDiv("MomWorkArea", job.JobId, job.JobAddress,job.ParentJobDescription);
           }
         });
         // hundle moms phone
@@ -1119,7 +1137,7 @@
         StudentResponsibleRelationSelect.value = "father";
         StudentResponsibleRelationSelect.dispatchEvent(new Event("change"));
         addNewPhone("ResPhoneArea", "", false);
-        addWorkToDiv("ResWorkArea", 1, "", false);
+        addWorkToDiv("ResWorkArea", 1, "", "",false);
       } else if (motherData && resData.ParentId === motherData.ParentId) {
         const StudentResponsibleRelationSelect = document.getElementById(
           "StudentResponsibleRelationSelect"
@@ -1127,7 +1145,7 @@
         StudentResponsibleRelationSelect.value = "mother";
         StudentResponsibleRelationSelect.dispatchEvent(new Event("change"));
         addNewPhone("ResPhoneArea", "", false);
-        addWorkToDiv("ResWorkArea", 1, "", false);
+        addWorkToDiv("ResWorkArea", 1, "", "",false);
       } else {
         const StudentResponsibleRelationSelect = document.getElementById(
           "StudentResponsibleRelationSelect"
@@ -1154,9 +1172,9 @@
         let ResJobs = resData.jobs;
         ResJobs.forEach((job, i) => {
           if (i === 0) {
-            addWorkToDiv("ResJobArea", job.JobId, job.JobAddress, false);
+            addWorkToDiv("ResJobArea", job.JobId, job.JobAddress,job.ParentJobDescription,false);
           } else {
-            addWorkToDiv("ResJobArea", job.JobId, job.JobAddress);
+            addWorkToDiv("ResJobArea", job.JobId, job.JobAddress,job.ParentJobDescription);
           }
         });
         // hundle dad phones
