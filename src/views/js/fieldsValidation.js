@@ -27,8 +27,6 @@ const checkStudentData = () => {
     StudentName.length === 0 ||
     StudentBirthDate.length === 0 ||
     StudentAddress.length === 0 ||
-    StudentBirthPlace.length === 0 ||
-    StudentBirthGovernorate.length === 0 ||
     !StudentNationalityId ||
     !StudentSex ||
     !StudentSiblingOrder ||
