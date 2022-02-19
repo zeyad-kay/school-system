@@ -242,8 +242,10 @@ async function renderReport(data, reportType, extension) {
         }));
       } else {
         dialog.showSaveDialog({defaultPath: `${data.title}.${extension}`}).then(res => {
-          fs.writeFileSync(res.filePath, resp.content);
-        });
+          if(!res.canceled){
+            fs.writeFileSync(res.filePath, resp.content);
+          }
+        }).catch();
       }
     } catch (e) {
       console.log(e);
