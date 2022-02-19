@@ -1,6 +1,5 @@
 // eslint-disable-next-line
 const ExpansesReportsNav = (data) => {
-  console.log(data);
   const FullyPaidList = document.querySelector("#fullyPaidCategories");
   let stages = data.stagesData;
   let fullyPaidDropDown = "";
@@ -52,7 +51,6 @@ const getSelectedCategories = (gradeId) => {
   const categories = document.getElementsByClassName(gradeId);
   const filtredCategories = [];
   for (let category of categories) {
-    console.log(category.value);
     if (category.checked) {
       filtredCategories.push(category.value);
     }
