@@ -33,7 +33,7 @@ const getSeatsData = async (gradeId,seatStart,seatStep) => {
       // map
     return stdsNames.map((std,i) => [stdIdsSeats[i].SeatNumber,std.StudentName]);
   });
-}
+};
 
 // const getClassStats = async (classId) => {
 //   return db["StudentClass"].count({ where: { ClassId: classId } });
@@ -484,9 +484,9 @@ const absenceSummary = async (
   JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"\
   JOIN \"Parent\" As \"Responsible\" ON \"Student\".\"StudentResponsibleId\" = \"Responsible\".\"ParentId\"\
   JOIN \"ParentPhone\" ON \"Responsible\".\"ParentId\" = \"ParentPhone\".\"ParentId\"\
-  WHERE \"AbsentDate\" > '" +
+  WHERE \"AbsentDate\" BETWEEN '" +
     startingDate +
-    "' AND \"AbsentDate\" < '" +
+    "' AND '" +
     endingDate +
     "'";
   if (classId) {

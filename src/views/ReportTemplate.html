@@ -32,6 +32,8 @@
       <div class="row mt-5">
         <button
           id="excelButton"
+          ,
+          onclick="printReport('xlsx')"
           type="submit"
           class="col-6 btn btn-success text-center rounded-pill"
         >
@@ -39,7 +41,7 @@
         </button>
         <button
           id="PrintButton"
-          onclick="printReport()"
+          onclick="printReport('pdf')"
           class="col-6 btn btn-success text-center rounded-pill"
         >
           طباعة
@@ -83,29 +85,21 @@
     <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="../../node_modules/datatables.net/js/jquery.dataTables.js"></script>
-    <script src="js/lib/jquery.table2excel.min.js"></script>
     <script>
-      function printReport() {
+      function printReport(extension) {
         window.api.send("printReport", {
-          rows: GlobalData["rows"],
-          subHeaders: GlobalData["headers"],
-          title: GlobalData["title"],
+          data: {
+            rows: GlobalData["rows"],
+            subHeaders: GlobalData["headers"],
+            title: GlobalData["title"],
+          },
+          extension,
         });
       }
       $(document).ready(function () {
         $("#mytable").DataTable({
-          paging: false,
           searching: true,
           ordering: false,
-        });
-      });
-      $("#excelButton").click(function () {
-        $("#mytable").table2excel({
-          // exclude CSS class
-          exclude: ".noExl",
-          name: "Student Test",
-          filename: `${document.querySelector("h1").innerText}`,
-          fileext: ".xls",
         });
       });
     </script>

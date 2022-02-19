@@ -159,20 +159,18 @@ ipcMain.on("getAbsenceReport", async (err, { fromDate,
     subHeaders.push(key);
     r.push(value);
   }
-  (subHeaders);
-  renderReport({ title, rows: r, subHeaders }, reportTypes.absence);
+  renderReport({ title, rows: r, subHeaders }, reportTypes.absence, "pdf");
 });
 let reportTypes = {
   absence: "0",
-  seats:"2",
+  seats: "2",
   regular: "1"
 };
-ipcMain.on("printReport", (err, data) => {
-  renderReport(data, reportTypes.regular);
-  // renderReport
+ipcMain.on("printReport", async (err, { data, extension }) => {
+  await renderReport(data, reportTypes.regular, extension);
 });
 
-async function renderReport(data, reportType) {
+async function renderReport(data, reportType, extension) {
   try {
     // check if it is not initialized
     // incase it didn't start properly on start
@@ -186,7 +184,7 @@ async function renderReport(data, reportType) {
       let pth = "";
       if (reportType === reportTypes.absence) {
         pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/PDFAbsenceReport.html")).toString();
-      }else if(reportType === reportTypes.seats){
+      } else if (reportType === reportTypes.seats) {
         pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/SeatNumberCard.html")).toString();
       }
       else {
@@ -197,16 +195,24 @@ async function renderReport(data, reportType) {
           content: pth,
           helpers: "function isEqual(v1,v2,options) { if(v1 === v2) {return options.fn(this);} return options.inverse(this);}",
           engine: "handlebars",
-          recipe: "chrome-pdf",
+          HtmlToXlsx: {
+            "InsertToXlsxTemplate": true,
+            "WaitForJS": false,
+            "HtmlEngine": "chrome"
+          },
+          "BaseXlsxTemplate": {
+            "Content": "base-template-string-encoded-as-base64",
+          },
+          recipe: extension === "pdf" ? "chrome-pdf" : "html-to-xlsx",
           chrome: {
             "displayHeaderFooter": true,
-            "landscape" : reportType === reportTypes.seats ? true : false,
+            "landscape" : reportType === reportTypes.seats || data.subHeaders.length >= 5 ? true : false,
             "format" : "A4",
             "marginTop": "20px",
             "marginRight": "20px",
             "marginBottom": "20px",
             "marginLeft": "20px",
-            "scale" : reportType === reportTypes.seats ? 0.6 : 1
+            "scale": reportType === reportTypes.seats ? 0.6 : 1
           }
         },
         data: {
@@ -214,28 +220,31 @@ async function renderReport(data, reportType) {
           rows: data.rows,
           subHeaders: data.subHeaders,
           title: data.title,
-          stageName : data.stageName,
-          gradeName : data.gradeName,
-          yearStart : data.yearStart,
-          yearEnd : data.yearEnd
+          stageName: data.stageName,
+          gradeName: data.gradeName,
+          yearStart: data.yearStart,
+          yearEnd: data.yearEnd
         }
       });
 
-      fs.writeFileSync(path.join(CWD, "report.pdf"), resp.content);
-
-      const pdfWindow = new BrowserWindow({
-        width: 1024,
-        height: 800,
-        webPreferences: {
-          plugins: true
-        }
-      });
-
-      pdfWindow.loadURL(url.format({
-        pathname: path.join(CWD, "report.pdf"),
-        protocol: "file"
-      }));
-
+      if (extension === "pdf") {
+        fs.writeFileSync(path.join(CWD, `report.${extension}`), resp.content);
+        const pdfWindow = new BrowserWindow({
+          width: 1024,
+          height: 800,
+          webPreferences: {
+            plugins: true
+          }
+        });
+        pdfWindow.loadURL(url.format({
+          pathname: path.join(CWD, `report.${extension}`),
+          protocol: "file"
+        }));
+      } else {
+        dialog.showSaveDialog({defaultPath: `${data.title}.${extension}`}).then(res => {
+          fs.writeFileSync(res.filePath, resp.content);
+        });
+      }
     } catch (e) {
       console.log(e);
       DialogBox(["error while rendering jsreport"], "error", "error while starting jsreport");
@@ -789,8 +798,8 @@ ipcMain.on("receiveWarning", (err, { StudentId, WarningDate }) => {
       DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
     });
 });
-ipcMain.on("generateStudentsCards", async (err, { gradeId, gradeName, stageName,yearStart,yearEnd,seatStart,seatStep}) => {
-  getSeatsData(gradeId,seatStart,seatStep).then(finalSeats => {
+ipcMain.on("generateStudentsCards", async (err, { gradeId, gradeName, stageName, yearStart, yearEnd, seatStart, seatStep }) => {
+  getSeatsData(gradeId, seatStart, seatStep).then(finalSeats => {
     let d = {
       rows: finalSeats,
       gradeName,
@@ -798,7 +807,7 @@ ipcMain.on("generateStudentsCards", async (err, { gradeId, gradeName, stageName,
       yearStart,
       yearEnd
     };
-    renderReport(d,reportTypes.seats);
+    renderReport(d, reportTypes.seats, "pdf");
   }).catch((err) => {
     DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
     console.error(err);
