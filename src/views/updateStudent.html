@@ -839,21 +839,13 @@
       let caretaker = document.getElementById(divId);
       caretaker.hidden = element.value == "other" ? false : true;
     }
-    function test() {
-      let d = document.getElementById("DadAcademicDegree");
-      console.log(d.value);
-    }
     window.api.receive("getStudentDataFromMain", (data) => {
-      // onchange="test()" id="DadAcademicDegree"
-
       loadSideBar(data.students);
-      // console.log(data);
       ReportsNav(data);
       window.api.receive("reload", () => {
         window.api.send("sendStudentIdToMain", data.StudentId);
       });
-      // hundle student warnings 
-      console.log(data.StudentWarnings);
+      // handle student warnings 
       if (data.StudentWarnings.length === 0) {
         document.getElementById("StudentWarningsTable").hidden = true;
       } else {
@@ -938,8 +930,6 @@
       const StageList = document.getElementById("StageList");
       const GradeList = document.getElementById("GradeList");
       const ClassList = document.getElementById("ClassList");
-      console.log();
-      //console.log(StageList);
       data.stagesData.forEach((stage) => {
         const option = document.createElement("option");
         option.setAttribute("value", stage.StageId);
@@ -1060,7 +1050,6 @@
         addNewPhone("MomPhoneArea", "", false);
         addWorkToDiv("MomWorkArea", 1, "", false);
       } else {
-        console.log(motherData)
         document
           .getElementById("MomName")
           .setAttribute("value", motherData.ParentName);
@@ -1233,7 +1222,6 @@
         .addEventListener("click", () => {
           let TransferStudentData = checkTransferStudentData();
           let studentId = data.studentId;
-          console.log(TransferStudentData);
           if (TransferStudentData.errors.length === 0) {
             let transferredSchoolName =
               TransferStudentData.data.transferredSchoolName;

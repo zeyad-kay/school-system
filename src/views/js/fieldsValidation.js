@@ -123,7 +123,6 @@ const checkFatherData = () => {
     errors.push("يجب إدخال رقم واحد على الأققل للأب");
   }
   if (errors.length === 0) {
-    console.log("test");
     return {
       errors: [],
       fatherData: {
@@ -200,7 +199,6 @@ const checkMotherData = () => {
     errors.push("يجب إدخال رقم واحد على الأققل للأم");
   }
   if (errors.length === 0) {
-    console.log(DeadMomTrigger);
     return {
       errors: [],
       motherData: {
@@ -241,7 +239,6 @@ const checkResData = () => {
   let ResPhoneAreaChilds = document.getElementById("ResPhoneArea").children;
   let DeadMomTrigger = document.getElementById("DeadMomTrigger").checked;
   let DeadDadTrigger = document.getElementById("DeadDadTrigger").checked;
-  console.log(DeadMomTrigger, StudentResponsibleRelationSelect);
   if (DeadDadTrigger && StudentResponsibleRelationSelect === "father") {
     errors.push("لا يمكن اختيار الأب ك ولي أمر وهو متوفي");
   }
