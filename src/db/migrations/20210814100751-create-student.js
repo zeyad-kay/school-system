@@ -27,6 +27,10 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
+        StudentBirthGovernorate: {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
         StudentAddress: {
           type: Sequelize.STRING,
           allowNull: false

@@ -283,11 +283,25 @@
       </div>
 
       <div class="row my-3" dir="rtl">
-        <div class="col-12">
+        <div class="col-4">
           <div class="input-group input-group mb-2 col">
             <span class="input-group-text" id="inputGroup-sizing">تاريخ الميلاد:</span>
             <input type="date" class="form-control" aria-label="Sizing example input"
               aria-describedby="inputGroup-sizing-sm" required id="StudentBirthDate" />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="input-group input-group mb-2 col">
+            <span class="input-group-text" id="inputGroup-sizing">محل الميلاد:</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" required id="StudentBirthPlace" />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="input-group input-group mb-2 col">
+            <span class="input-group-text" id="inputGroup-sizing">محافظة الميلاد:</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" required id="StudentBirthGovernorate" />
           </div>
         </div>
       </div>
@@ -897,6 +911,12 @@
       document
         .getElementById("StudentBirthDate")
         .setAttribute("value", data.StudentBirthDate);
+      document
+        .getElementById("StudentBirthPlace")
+        .setAttribute("value", data.StudentBirthPlace || "");
+      document
+        .getElementById("StudentBirthGovernorate")
+        .setAttribute("value", data.StudentBirthGovernorate || "");
       document
         .getElementById("StudentRegisterDate")
         .setAttribute("value", data.StudentRegisterDate);
