@@ -579,6 +579,7 @@
     dadWorkSelect.value = JobId;
     dadWorkTitle.appendChild(dadWorkSelect);
     wrapperDiv.appendChild(dadWorkTitle);
+
     const dadWorkAdress = document.createElement("div");
     dadWorkAdress.classList.add("col-12", "col-md-3");
     const dadWorkAdressInner = document.createElement("div");
@@ -648,6 +649,7 @@
       wrapperDiv.appendChild(removeButtonDiv);
     }
     dadJobArea.appendChild(wrapperDiv);
+    
   }
   function addNewPhone(devId, phone = "", addRemove = true) {
     let ID = Math.floor(Math.random() * (20000 - 500)) + 500;
