@@ -641,8 +641,9 @@ ipcMain.on(
   },
 );
 ipcMain.on("deleteStudentAbsent", (err, { studentId, absentDate }) => {
-  absent.deleteAbsence(studentId, absentDate).catch((err) => {
-    console.log(err);
+  absent.deleteAbsence(studentId, absentDate).then(result => {
+    mainWindow.webContents.send("reload", null);
+  }).catch((err) => {
     DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
   });
 });
@@ -753,6 +754,7 @@ ipcMain.on("login", function (event, args) {
 });
 ipcMain.on("sendStudentIdToMain", (err, studentId) => {
   // load screen
+  mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
   student.getStudentData(Number(studentId)).then((data) => {
     student
       .getAllStudents()

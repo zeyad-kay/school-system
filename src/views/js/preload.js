@@ -45,7 +45,8 @@ contextBridge.exposeInMainWorld("api", {
       "sentEssentialData",
       "reload",
       "updateInstallmentTable",
-      "getReportDataFromMain"
+      "getReportDataFromMain",
+      "reload"
     ];
     if (validChannels.includes(channel)) {
       // Deliberately strip event as it includes `sender`

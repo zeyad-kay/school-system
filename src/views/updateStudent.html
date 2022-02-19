@@ -853,12 +853,14 @@
       let caretaker = document.getElementById(divId);
       caretaker.hidden = element.value == "other" ? false : true;
     }
+    let GlobalStudentId = null;
+    window.api.receive("reload", () => {
+      window.api.send("sendStudentIdToMain", GlobalStudentId);
+    });
     window.api.receive("getStudentDataFromMain", (data) => {
       loadSideBar(data.students);
       ReportsNav(data);
-      window.api.receive("reload", () => {
-        window.api.send("sendStudentIdToMain", data.StudentId);
-      });
+      GlobalStudentId = data.StudentId;
       // handle student warnings 
       if (data.StudentWarnings.length === 0) {
         document.getElementById("StudentWarningsTable").hidden = true;

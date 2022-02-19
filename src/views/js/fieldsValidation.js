@@ -165,11 +165,11 @@ const checkMotherData = () => {
     MomAddress.length === 0 ||
     MomAcademicDegree.length === 0 || MomAcademicDegree === 0
   ) {
-    errors.push("من فضلك ادخل جميع الحقول في بيانات الأب");
+    errors.push("من فضلك ادخل جميع الحقول في بيانات الأم");
   }
-  if (MomNationalId.length === 0 && MomPassportId.length === 0) {
-    errors.push("يجب ادخال الرقم القومي او رقم الباسبورت للأب");
-  }
+  // if (MomNationalId.length === 0 && MomPassportId.length === 0) {
+  //   errors.push("يجب ادخال الرقم القومي او رقم الباسبورت للأب");
+  // }
   if (MomNationalId.length === 0) {
     MomNationalId = null;
   }
