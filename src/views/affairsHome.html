@@ -275,8 +275,6 @@
     window.api.receive("sentEssentialData", (data) => {
       loadSideBar(data.students);
       ReportsNav(data);
-      console.log("Here");
-      console.log(data.stagesData[2]["Grades"]);
     });
     window.api.send("ScriptLoaded");
   </script>

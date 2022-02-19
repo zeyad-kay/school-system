@@ -33,7 +33,7 @@ const getSeatsData = async (gradeId,seatStart,seatStep) => {
       // map
     return stdsNames.map((std,i) => [stdIdsSeats[i].SeatNumber,std.StudentName]);
   });
-}
+};
 
 // const getClassStats = async (classId) => {
 //   return db["StudentClass"].count({ where: { ClassId: classId } });
@@ -454,7 +454,6 @@ const AbsentDays = async () => {
     .then((dates) =>
       dates.map((date) => {
         const data = date.toJSON();
-        console.log(data);
         return [
           data["Student"]["StudentClass"]["Class"]["Grade"]["GradeName"],
           data["Student"]["StudentClass"]["Class"]["ClassId"],
@@ -553,7 +552,6 @@ const absenceSummary = async (
       //     [];
       // }
     });
-    console.log(data);
     return data;
   });
 };

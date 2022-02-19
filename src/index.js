@@ -12,14 +12,10 @@ const installment = require("./queries/installment");
 const { StartNewYear } = require("./queries/newYear");
 const reports = require("./reports/reports");
 const Bus = require("./queries/BusRoutes");
-const seats = require("./queries/seats");
-const { absenceSummary, classList } = require("./reports/affairs");
+const { absenceSummary } = require("./reports/affairs");
 const fs = require("fs");
 const url = require("url");
-const { data, map } = require("jquery");
-const { Console } = require("console");
 const { getSeatsData } = require("./reports/affairs");
-const { end } = require("@popperjs/core");
 let CWD = process.cwd();
 
 const rootDir = process.platform === "darwin" ? __dirname : CWD;
@@ -34,7 +30,7 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 let mainWindow;
-const createWindow = () => {
+const createWindow = async () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1920,
@@ -46,6 +42,8 @@ const createWindow = () => {
       preload: path.join(__dirname, "views/js/preload.js"),
     },
   });
+
+  await jsreport.init();
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "views/login.html"));
@@ -153,7 +151,6 @@ ipcMain.on("getAbsenceReport", async (err, { fromDate,
   if (StageId === "0") StageId = null;
   if (GradeId === "0") GradeId = null;
   if (ClassId === "0") ClassId = null;
-  console.log({ criteria });
   let rows = await absenceSummary(fromDate, toDate, absenceNumber, StageId, GradeId, ClassId, criteria);
   let title = "تقرير غياب";
   let r = [];
@@ -162,23 +159,21 @@ ipcMain.on("getAbsenceReport", async (err, { fromDate,
     subHeaders.push(key);
     r.push(value);
   }
-  console.log(subHeaders);
-  renderReport({ title, rows: r, subHeaders }, reportTypes.absence);
+  renderReport({ title, rows: r, subHeaders }, reportTypes.absence, "pdf");
 });
 let reportTypes = {
   absence: "0",
-  seats:"2",
+  seats: "2",
   regular: "1"
 };
-ipcMain.on("printReport", (err, data) => {
-  renderReport(data, reportTypes.regular);
-  // renderReport
+ipcMain.on("printReport", async (err, { data, extension }) => {
+  await renderReport(data, reportTypes.regular, extension);
 });
 
-async function renderReport(data, reportType) {
+async function renderReport(data, reportType, extension) {
   try {
-    // we defer jsreport initialization on first report render
-    // to avoid slowing down the app at start time
+    // check if it is not initialized
+    // incase it didn't start properly on start
     if (!jsreport._initialized) {
       await jsreport.init();
     }
@@ -189,7 +184,7 @@ async function renderReport(data, reportType) {
       let pth = "";
       if (reportType === reportTypes.absence) {
         pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/PDFAbsenceReport.html")).toString();
-      }else if(reportType === reportTypes.seats){
+      } else if (reportType === reportTypes.seats) {
         pth = fs.readFileSync(path.join(__dirname, "./reportsTemplete/SeatNumberCard.html")).toString();
       }
       else {
@@ -200,16 +195,24 @@ async function renderReport(data, reportType) {
           content: pth,
           helpers: "function isEqual(v1,v2,options) { if(v1 === v2) {return options.fn(this);} return options.inverse(this);}",
           engine: "handlebars",
-          recipe: "chrome-pdf",
+          HtmlToXlsx: {
+            "InsertToXlsxTemplate": true,
+            "WaitForJS": false,
+            "HtmlEngine": "chrome"
+          },
+          "BaseXlsxTemplate": {
+            "Content": "base-template-string-encoded-as-base64",
+          },
+          recipe: extension === "pdf" ? "chrome-pdf" : "html-to-xlsx",
           chrome: {
             "displayHeaderFooter": true,
-            "landscape" : reportType === reportTypes.seats ? true : false,
+            "landscape" : reportType === reportTypes.seats || data.subHeaders.length >= 5 ? true : false,
             "format" : "A4",
             "marginTop": "20px",
             "marginRight": "20px",
             "marginBottom": "20px",
             "marginLeft": "20px",
-            "scale" : reportType === reportTypes.seats ? 0.6 : 1
+            "scale": reportType === reportTypes.seats ? 0.6 : 1
           }
         },
         data: {
@@ -217,28 +220,31 @@ async function renderReport(data, reportType) {
           rows: data.rows,
           subHeaders: data.subHeaders,
           title: data.title,
-          stageName : data.stageName,
-          gradeName : data.gradeName,
-          yearStart : data.yearStart,
-          yearEnd : data.yearEnd
+          stageName: data.stageName,
+          gradeName: data.gradeName,
+          yearStart: data.yearStart,
+          yearEnd: data.yearEnd
         }
       });
 
-      fs.writeFileSync(path.join(CWD, "report.pdf"), resp.content);
-
-      const pdfWindow = new BrowserWindow({
-        width: 1024,
-        height: 800,
-        webPreferences: {
-          plugins: true
-        }
-      });
-
-      pdfWindow.loadURL(url.format({
-        pathname: path.join(CWD, "report.pdf"),
-        protocol: "file"
-      }));
-
+      if (extension === "pdf") {
+        fs.writeFileSync(path.join(CWD, `report.${extension}`), resp.content);
+        const pdfWindow = new BrowserWindow({
+          width: 1024,
+          height: 800,
+          webPreferences: {
+            plugins: true
+          }
+        });
+        pdfWindow.loadURL(url.format({
+          pathname: path.join(CWD, `report.${extension}`),
+          protocol: "file"
+        }));
+      } else {
+        dialog.showSaveDialog({defaultPath: `${data.title}.${extension}`}).then(res => {
+          fs.writeFileSync(res.filePath, resp.content);
+        });
+      }
     } catch (e) {
       console.log(e);
       DialogBox(["error while rendering jsreport"], "error", "error while starting jsreport");
@@ -446,7 +452,6 @@ ipcMain.on("getEssentialData", function (err, destination) {
   } else {
     // get all stages , grades and classes
     getEssentialData().then((data) => {
-      console.log(data.stagesData.Grades);
       if (destination === "addStudent") {
         mainWindow.loadFile(path.join(__dirname, "views/addNewStudent.html"));
         ipcMain.on("ScriptLoaded", function cb() {
@@ -656,8 +661,6 @@ ipcMain.on(
   function (err, { studentId, studentData, fatherData, motherData, resData }) {
     mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
     //update student
-    // console.log(studentData);
-    console.log(fatherData);
     student
       .updateStudentByStudentId(
         studentId,
@@ -713,39 +716,37 @@ ipcMain.on(
 // code. You can also put them in separate files and import them here.
 let CurrentWindow = null;
 ipcMain.on("login", function (event, args) {
-  console.log(args[0], args[1]);
   // load Students
   switch (args[0]) {
-    case "1":
-      if (args[1] === "1234") {
-        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
-        CurrentWindow = "expenses";
-        getEssentialData().then((data) => {
-          mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
-          ipcMain.on("ScriptLoaded", function cb() {
-            mainWindow.webContents.send("sentEssentialData", data);
-            ipcMain.removeListener("ScriptLoaded", cb);
-          });
+  case "1":
+    if (args[1] === "1234") {
+      mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+      CurrentWindow = "expenses";
+      getEssentialData().then((data) => {
+        mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
+        ipcMain.on("ScriptLoaded", function cb() {
+          mainWindow.webContents.send("sentEssentialData", data);
+          ipcMain.removeListener("ScriptLoaded", cb);
         });
-      } else {
-        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-      }
-      break;
-    case "2":
-      if (args[1] === "2468") {
-        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
-        CurrentWindow = "affairs";
-        getEssentialData().then((data) => {
-          console.log(data);
-          mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
-          ipcMain.on("ScriptLoaded", function cb() {
-            mainWindow.webContents.send("sentEssentialData", data);
-            ipcMain.removeListener("ScriptLoaded", cb);
-          });
+      });
+    } else {
+      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+    }
+    break;
+  case "2":
+    if (args[1] === "2468") {
+      mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+      CurrentWindow = "affairs";
+      getEssentialData().then((data) => {
+        mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
+        ipcMain.on("ScriptLoaded", function cb() {
+          mainWindow.webContents.send("sentEssentialData", data);
+          ipcMain.removeListener("ScriptLoaded", cb);
         });
-      } else {
-        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-      };
+      });
+    } else {
+      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+    }
   }
 });
 ipcMain.on("sendStudentIdToMain", (err, studentId) => {
@@ -797,20 +798,20 @@ ipcMain.on("receiveWarning", (err, { StudentId, WarningDate }) => {
       DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
     });
 });
-ipcMain.on("generateStudentsCards", async (err, { gradeId, gradeName, stageName,yearStart,yearEnd,seatStart,seatStep}) => {
-      getSeatsData(gradeId,seatStart,seatStep).then(finalSeats => {
-        let d = {
-          rows : finalSeats,
-          gradeName,
-          stageName,
-          yearStart,
-          yearEnd
-        }
-        renderReport(d,reportTypes.seats);
-      }).catch((err) => {
-      DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
-      console.error(err);
-    });
+ipcMain.on("generateStudentsCards", async (err, { gradeId, gradeName, stageName, yearStart, yearEnd, seatStart, seatStep }) => {
+  getSeatsData(gradeId, seatStart, seatStep).then(finalSeats => {
+    let d = {
+      rows: finalSeats,
+      gradeName,
+      stageName,
+      yearStart,
+      yearEnd
+    };
+    renderReport(d, reportTypes.seats, "pdf");
+  }).catch((err) => {
+    DialogBox(["حدث خطأ برجاء المحاولة مجددا"], "error", "خطأ");
+    console.error(err);
+  });
 });
 ipcMain.on("sendAffairsReportData", (err, args) => {
   // load screen
