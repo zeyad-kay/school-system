@@ -13,25 +13,25 @@ const dateDiffIndays = (date1, date2) => {
     Math.floor(
       (Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) -
         Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate())) /
-        (1000 * 60 * 60 * 24),
+      (1000 * 60 * 60 * 24),
     ) + 1
   );
 };
 
-const getSeatsData = async (gradeId,seatStart,seatStep) => {
-  return generateStudentSeats(gradeId,seatStart,seatStep).then(async (stdIdsSeats) => {
+const getSeatsData = async (gradeId, seatStart, seatStep) => {
+  return generateStudentSeats(gradeId, seatStart, seatStep).then(async (stdIdsSeats) => {
     let studentsIds = stdIdsSeats.map(std => std.StudentId);
     let stdsNames = await db["Student"].findAll({
-      attributes : ["StudentName"],
-      where : {
-        StudentId : {
-          [Op.in] : studentsIds
+      attributes: ["StudentName"],
+      where: {
+        StudentId: {
+          [Op.in]: studentsIds
         }
       },
       order: [["StudentName", "ASC"]]
     }).then(mapToJSON);
-      // map
-    return stdsNames.map((std,i) => [stdIdsSeats[i].SeatNumber,std.StudentName]);
+    // map
+    return stdsNames.map((std, i) => [stdIdsSeats[i].SeatNumber, std.StudentName]);
   });
 };
 
@@ -372,8 +372,8 @@ const getAbsenceRatioInAllGrades = async (startingDate, endingDate) => {
                 Absencecount,
                 (Absencecount /
                   (dateDiffIndays(startingDate, endingDate) * studentCount)) *
-                  100 +
-                  " %",
+                100 +
+                " %",
               ];
             },
           ),
@@ -510,19 +510,19 @@ const absenceSummary = async (
     " GROUP BY \"StudentName\", \"Stage\".\"StageId\", \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"ParentPhoneNumber\"\
   HAVING COUNT(\"StudentAbsent\".\"AbsentDate\") ";
   switch (inequality) {
-  case ">=":
-    query += ">=";
-    break;
-  case "<=":
-    query += "<=";
-    break;
-  case "=":
-    query += "=";
-    break;
-  default:
-    query += ">=";
+    case ">=":
+      query += ">=";
+      break;
+    case "<=":
+      query += "<=";
+      break;
+    case "=":
+      query += "=";
+      break;
+    default:
+      query += ">=";
   }
-  query += " " + 
+  query += " " +
     minDays +
     " ORDER BY \"Stage\".\"StageId\", \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"StudentName\"";
 
@@ -544,7 +544,7 @@ const absenceSummary = async (
           data[student["GradeName"]].push(student);
         }
       }
-      
+
       // if (
       //   !data[student["StageName"]][student["GradeName"]][student["ClassName"]]
       // ) {
@@ -609,20 +609,38 @@ ORDER BY \"Student\".\"StudentName\"\
   });
 };
 
-const motherData = async (gradeId) => {
-  const query =
+const motherData = async (stageId,gradeId,classId) => {
+  let query =
     "\
   SELECT \"Student\".\"StudentName\", \"Mother\".\"ParentName\", \"Mother\".\"ParentAcademicDegree\", \"Job\".\"JobName\",\
        \"Student\".\"StudentFamilyStatus\", \"ParentPhone\".\"ParentPhoneNumber\", \"Student\".\"StudentAddress\" FROM \"Student\"\
 JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
 JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
 JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"\
 JOIN \"Parent\" AS \"Mother\" ON \"Student\".\"StudentMotherId\" = \"Mother\".\"ParentId\"\
 LEFT JOIN \"ParentJob\" ON \"Mother\".\"ParentId\" = \"ParentJob\".\"ParentId\"\
 LEFT JOIN \"Job\" ON \"ParentJob\".\"ParentJobId\" = \"Job\".\"JobId\"\
-LEFT JOIN \"ParentPhone\" ON \"Mother\".\"ParentId\" = \"ParentPhone\".\"ParentId\"\
-WHERE \"Grade\".\"GradeId\" = " + gradeId + " \
-GROUP BY \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"Student\".\"StudentName\", \"Mother\".\"ParentName\",\
+LEFT JOIN \"ParentPhone\" ON \"Mother\".\"ParentId\" = \"ParentPhone\".\"ParentId\"";
+if (classId) {
+  query +=
+    " WHERE \"Stage\".\"StageId\" = " +
+    stageId +
+    " AND \"Grade\".\"GradeId\" = " +
+    gradeId +
+    " AND \"Class\".\"ClassId\" = " +
+    classId;
+} else if (gradeId) {
+  query +=
+    " WHERE \"Stage\".\"StageId\" = " +
+    stageId +
+    " AND \"Grade\".\"GradeId\" = " +
+    gradeId;
+} else if (stageId) {
+  query += " WHERE \"Stage\".\"StageId\" = '" + stageId + "'";
+}
+
+query += "GROUP BY \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"Student\".\"StudentName\", \"Mother\".\"ParentName\",\
          \"Mother\".\"ParentAcademicDegree\", \"Job\".\"JobName\", \"Student\".\"StudentFamilyStatus\",\
          \"ParentPhone\".\"ParentPhoneNumber\", \"Student\".\"StudentAddress\"\
   ";
@@ -649,8 +667,8 @@ GROUP BY \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"Student\".\"StudentName
   });
 };
 
-const studentsAges = async (gradeId) => {
-  const query =
+const studentsAges = async (stageId, gradeId, classId) => {
+  let query =
     "\
   SELECT \"Student\".\"StudentName\", \"Student\".\"StudentBirthDate\",\
        age((date_part('year', now()) || '-10-01')::date, \"Student\".\"StudentBirthDate\"),\
@@ -661,12 +679,30 @@ const studentsAges = async (gradeId) => {
   JOIN \"StudentClass\" ON \"Student\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
   JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
   JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+  JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"\
   JOIN \"Parent\" AS \"Responsible\" ON \"Student\".\"StudentResponsibleId\" = \"Responsible\".\"ParentId\"\
   LEFT JOIN \"ParentJob\" ON \"Responsible\".\"ParentId\" = \"ParentJob\".\"ParentId\"\
   LEFT JOIN \"Job\" ON \"ParentJob\".\"ParentJobId\" = \"Job\".\"JobId\"\
-  WHERE \"Grade\".\"GradeId\" = " + gradeId + " \
-  ORDER BY \"Grade\".\"GradeId\", \"Student\".\"StudentName\"\
   ";
+  if (classId) {
+    query +=
+      " WHERE \"Stage\".\"StageId\" = " +
+      stageId +
+      " AND \"Grade\".\"GradeId\" = " +
+      gradeId +
+      " AND \"Class\".\"ClassId\" = " +
+      classId;
+  } else if (gradeId) {
+    query +=
+      " WHERE \"Stage\".\"StageId\" = " +
+      stageId +
+      " AND \"Grade\".\"GradeId\" = " +
+      gradeId;
+  } else if (stageId) {
+    query += " WHERE \"Stage\".\"StageId\" = '" + stageId + "'";
+  }
+  query +=
+    "ORDER BY \"Student\".\"StudentName\"";
   return db.sequelize.query(query).then((students) => {
     return students[0].map((student) => {
       let age = student["age"]["years"];
@@ -674,30 +710,30 @@ const studentsAges = async (gradeId) => {
       if (student["age"]["months"]) {
         age += " و ";
         switch (student["age"]["months"]) {
-        case 1:
-          age += "شهر";
-          break;
-        case 2:
-          age += "شهرين";
-          break;
-        case 11:
-          age += "11 شهر";
-          break;
-        default:
-          age += student["age"]["months"] + " أشهر";
+          case 1:
+            age += "شهر";
+            break;
+          case 2:
+            age += "شهرين";
+            break;
+          case 11:
+            age += "11 شهر";
+            break;
+          default:
+            age += student["age"]["months"] + " أشهر";
         }
       }
       if (student["age"]["days"]) {
         age += " و ";
         switch (student["age"]["days"]) {
-        case 1:
-          age += "يوم";
-          break;
-        case 2:
-          age += "يومين";
-          break;
-        default:
-          student["age"]["days"] < 11 ? age += " " + student["age"]["days"] + " أيام" : age += " " + student["age"]["days"] + " يوم";
+          case 1:
+            age += "يوم";
+            break;
+          case 2:
+            age += "يومين";
+            break;
+          default:
+            student["age"]["days"] < 11 ? age += " " + student["age"]["days"] + " أيام" : age += " " + student["age"]["days"] + " يوم";
         }
       }
       return [

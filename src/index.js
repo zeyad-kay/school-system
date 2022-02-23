@@ -206,8 +206,8 @@ async function renderReport(data, reportType, extension) {
           recipe: extension === "pdf" ? "chrome-pdf" : "html-to-xlsx",
           chrome: {
             "displayHeaderFooter": true,
-            "landscape" : reportType === reportTypes.seats || data.subHeaders.length >= 5 ? true : false,
-            "format" : "A4",
+            "landscape": reportType === reportTypes.seats || data.subHeaders.length >= 5 ? true : false,
+            "format": "A4",
             "marginTop": "20px",
             "marginRight": "20px",
             "marginBottom": "20px",
@@ -241,8 +241,8 @@ async function renderReport(data, reportType, extension) {
           protocol: "file"
         }));
       } else {
-        dialog.showSaveDialog({defaultPath: `${data.title}.${extension}`}).then(res => {
-          if(!res.canceled){
+        dialog.showSaveDialog({ defaultPath: `${data.title}.${extension}` }).then(res => {
+          if (!res.canceled) {
             fs.writeFileSync(res.filePath, resp.content);
           }
         }).catch();
@@ -446,6 +446,14 @@ ipcMain.on("getEssentialData", function (err, destination) {
   } else if (destination === "studentsAbsentReport") {
     getEssentialData().then((data) => {
       mainWindow.loadFile(path.join(__dirname, "views/AbsenceReportSettings.html"));
+      ipcMain.on("ScriptLoaded", function cb() {
+        mainWindow.webContents.send("sentEssentialData", data.stagesData);
+        ipcMain.removeListener("ScriptLoaded", cb);
+      });
+    });
+  } else if (destination === "stagesReport") {
+    getEssentialData().then((data) => {
+      mainWindow.loadFile(path.join(__dirname, "views/stagesReport.html"));
       ipcMain.on("ScriptLoaded", function cb() {
         mainWindow.webContents.send("sentEssentialData", data.stagesData);
         ipcMain.removeListener("ScriptLoaded", cb);
@@ -721,35 +729,35 @@ let CurrentWindow = null;
 ipcMain.on("login", function (event, args) {
   // load Students
   switch (args[0]) {
-  case "1":
-    if (args[1] === "1234") {
-      mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
-      CurrentWindow = "expenses";
-      getEssentialData().then((data) => {
-        mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
-        ipcMain.on("ScriptLoaded", function cb() {
-          mainWindow.webContents.send("sentEssentialData", data);
-          ipcMain.removeListener("ScriptLoaded", cb);
+    case "1":
+      if (args[1] === "1234") {
+        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+        CurrentWindow = "expenses";
+        getEssentialData().then((data) => {
+          mainWindow.loadFile(path.join(__dirname, "views/Expenses.html"));
+          ipcMain.on("ScriptLoaded", function cb() {
+            mainWindow.webContents.send("sentEssentialData", data);
+            ipcMain.removeListener("ScriptLoaded", cb);
+          });
         });
-      });
-    } else {
-      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-    }
-    break;
-  case "2":
-    if (args[1] === "2468") {
-      mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
-      CurrentWindow = "affairs";
-      getEssentialData().then((data) => {
-        mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
-        ipcMain.on("ScriptLoaded", function cb() {
-          mainWindow.webContents.send("sentEssentialData", data);
-          ipcMain.removeListener("ScriptLoaded", cb);
+      } else {
+        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+      }
+      break;
+    case "2":
+      if (args[1] === "2468") {
+        mainWindow.loadFile(path.join(__dirname, "views/loading.html"));
+        CurrentWindow = "affairs";
+        getEssentialData().then((data) => {
+          mainWindow.loadFile(path.join(__dirname, "views/affairsHome.html"));
+          ipcMain.on("ScriptLoaded", function cb() {
+            mainWindow.webContents.send("sentEssentialData", data);
+            ipcMain.removeListener("ScriptLoaded", cb);
+          });
         });
-      });
-    } else {
-      DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
-    }
+      } else {
+        DialogBox(["تاكد من كلمة السر"], "error", "خطأ");
+      }
   }
 });
 ipcMain.on("sendStudentIdToMain", (err, studentId) => {
@@ -821,6 +829,7 @@ ipcMain.on("sendAffairsReportData", (err, args) => {
   // load screen
   const ReportType = args[0];
   const params = args[1];
+  // console.log(params);
   reports["Affairs"][ReportType]["query"](...params)
     .then((results) => {
       let newWindow = new BrowserWindow({
