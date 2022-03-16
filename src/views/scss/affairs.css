@@ -6,10 +6,12 @@
 }
 
 .sidebar-nav {
-  width: 280px !important;
+  width: 300px !important;
   background-color: #161925;
 }
-
+ul{
+  list-style: none;
+}
 .navbar {
   background-color: #161925 !important;
 }
@@ -53,7 +55,7 @@ a:hover {
     overflow: auto !important;
   }
   main {
-    margin-left: 280px;
+    margin-left: 300px;
   }
   .sidebar-nav {
     overflow: auto;

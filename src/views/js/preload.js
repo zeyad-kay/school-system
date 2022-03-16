@@ -33,7 +33,8 @@ contextBridge.exposeInMainWorld("api", {
       "render-report",
       "getAbsenceReport",
       "printReport",
-      "generateStudentsCards"
+      "generateStudentsCards",
+      "stagesReport"
     ];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, data);
@@ -45,7 +46,8 @@ contextBridge.exposeInMainWorld("api", {
       "sentEssentialData",
       "reload",
       "updateInstallmentTable",
-      "getReportDataFromMain"
+      "getReportDataFromMain",
+      "reload"
     ];
     if (validChannels.includes(channel)) {
       // Deliberately strip event as it includes `sender`

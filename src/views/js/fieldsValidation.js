@@ -4,6 +4,8 @@ const checkStudentData = () => {
   let StudentNationalId = document.getElementById("StudentNationalId").value;
   let StudentPassportId = document.getElementById("StudentPassportId").value;
   let StudentBirthDate = document.getElementById("StudentBirthDate").value;
+  let StudentBirthPlace = document.getElementById("StudentBirthPlace").value;
+  let StudentBirthGovernorate = document.getElementById("StudentBirthGovernorate").value;
   let StudentRegisterDate = document.getElementById(
     "StudentRegisterDate",
   ).value;
@@ -52,6 +54,8 @@ const checkStudentData = () => {
           StudentNationalId,
           StudentPassportId,
           StudentBirthDate,
+          StudentBirthPlace,
+          StudentBirthGovernorate,
           StudentRegisterDate,
           StudentAddress,
           StudentNationalityId,
@@ -102,10 +106,11 @@ const checkFatherData = () => {
     const childs = DadworkAreaChilds[i].children;
     let ParentJobId = childs[0].children[0].value;
     let ParentJobAddress = childs[1].children[0].children[1].value;
-    if (ParentJobAddress === "") continue;
+    let ParentJobDesc = childs[2].children[0].children[1].value;
     jobs.push({
       ParentJobId,
       ParentJobAddress,
+      ParentJobDesc
     });
   }
   if (jobs.length === 0) {
@@ -161,11 +166,11 @@ const checkMotherData = () => {
     MomAddress.length === 0 ||
     MomAcademicDegree.length === 0 || MomAcademicDegree === 0
   ) {
-    errors.push("من فضلك ادخل جميع الحقول في بيانات الأب");
+    errors.push("من فضلك ادخل جميع الحقول في بيانات الأم");
   }
-  if (MomNationalId.length === 0 && MomPassportId.length === 0) {
-    errors.push("يجب ادخال الرقم القومي او رقم الباسبورت للأب");
-  }
+  // if (MomNationalId.length === 0 && MomPassportId.length === 0) {
+  //   errors.push("يجب ادخال الرقم القومي او رقم الباسبورت للأب");
+  // }
   if (MomNationalId.length === 0) {
     MomNationalId = null;
   }
@@ -178,10 +183,12 @@ const checkMotherData = () => {
     const childs = MomWorkAreaChilds[i].children;
     let ParentJobId = childs[0].children[0].value;
     let ParentJobAddress = childs[1].children[0].children[1].value;
-    if (ParentJobAddress === "") continue;
+    let ParentJobDesc = childs[2].children[0].children[1].value;
+    console.log(ParentJobDesc);
     jobs.push({
       ParentJobId,
       ParentJobAddress,
+      ParentJobDesc
     });
   }
   if (jobs.length === 0) {

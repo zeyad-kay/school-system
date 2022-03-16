@@ -25,7 +25,7 @@ const addNewAbsenceDay = async (StudentId, AbsentReasonName, AbsentDate) => {
 
   const absenceDays = student.dataValues.StudentAbsents.length;
   const warnings = student.dataValues.StudentWarnings.length;
-  const perWarning = 10;
+  const perWarning = 5;
 
   if (absenceDays - warnings * perWarning >= perWarning - 1) {
     return await db.sequelize.transaction(async (t) => {

@@ -19,7 +19,8 @@
     "db:seed:generate": "sequelize-cli seed:generate --name",
     "db:seed": "sequelize-cli db:seed:all",
     "db:clean": "sequelize-cli db:migrate:undo:all",
-    "db:drop": "sequelize-cli db:drop"
+    "db:drop": "sequelize-cli db:drop",
+    "fillStudents" : "node seed-production.js"
   },
   "keywords": [],
   "author": "zeyad-kay",
