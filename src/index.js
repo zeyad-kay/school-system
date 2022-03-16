@@ -455,7 +455,7 @@ ipcMain.on("getEssentialData", function (err, destination) {
     getEssentialData().then((data) => {
       mainWindow.loadFile(path.join(__dirname, "views/stagesReport.html"));
       ipcMain.on("ScriptLoaded", function cb() {
-        mainWindow.webContents.send("sentEssentialData", data.stagesData);
+        mainWindow.webContents.send("sentEssentialData", {stagesData : data.stagesData,jobs : data.jobs});
         ipcMain.removeListener("ScriptLoaded", cb);
       });
     });
