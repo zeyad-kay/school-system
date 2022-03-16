@@ -55,9 +55,16 @@
         </div>
         <div class="row my-3" dir="rtl">
             <div class="col-md-4 col-12">
-                <select class="form-select" aria-label="Default select example" id="reportType">
+                <select class="form-select" onchange="reportSelectChange()" aria-label="Default select example"
+                    id="reportType">
                     <option value="StudentsAges" selected>اعمار الطلاب</option>
                     <option value="motherData">بيانات الأم</option>
+                    <option value="jobReport">بيانات على حسب الوظيفة</option>
+                </select>
+            </div>
+            <div class="col-md-4 col-12">
+                <select class="form-select" hidden aria-label="Default select example" id="jobsDataSelect">
+                    <!-- <option value="StudentsAges" selected>اعمار الطلاب</option> -->
                 </select>
             </div>
         </div>
@@ -70,6 +77,15 @@
         </div>
     </main>
     <script>
+        function reportSelectChange() {
+            let reportType = document.getElementById("reportType").value;
+            console.log(reportType);
+            if (reportType === "jobReport") {
+                document.getElementById("jobsDataSelect").hidden = false;
+            }else{
+                document.getElementById("jobsDataSelect").hidden = true;
+            }
+        }
         function getReport() {
             const StageId = document.getElementById("StageList").value;
             const GradeId = document.getElementById("GradeList").value;
@@ -78,7 +94,16 @@
             console.log(StageId, GradeId, ClassId);
             window.api.send("sendAffairsReportData", [reportType, [Number(StageId), Number(GradeId), Number(ClassId)]]);
         }
-        window.api.receive("sentEssentialData", (stagesData) => {
+        window.api.receive("sentEssentialData", ({ stagesData, jobs }) => {
+            console.log(jobs);
+            //fill jobs
+            let jobsDataSelect = document.getElementById("jobsDataSelect");
+            jobs.forEach((j) => {
+                const option = document.createElement("option");
+                option.value = j.JobId;
+                option.innerText = j.JobName;
+                jobsDataSelect.appendChild(option);
+            });
             // stages
             const StageList = document.getElementById("StageList");
             const GradeList = document.getElementById("GradeList");
