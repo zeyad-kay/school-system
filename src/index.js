@@ -206,7 +206,7 @@ async function renderReport(data, reportType, extension) {
           recipe: extension === "pdf" ? "chrome-pdf" : "html-to-xlsx",
           chrome: {
             "displayHeaderFooter": true,
-            "landscape": reportType === reportTypes.seats || data.subHeaders.length >= 5 ? true : false,
+            "landscape": data.subHeaders ? (data.subHeaders.length >= 5 ? true : false ) : false,
             "format": "A4",
             "marginTop": "20px",
             "marginRight": "20px",
@@ -216,7 +216,7 @@ async function renderReport(data, reportType, extension) {
           }
         },
         data: {
-          logo: cur + "/src/assets/images/index.png",
+          logo: cur + "\\src\\reportsTemplete\\local-assets\\logo.png",
           rows: data.rows,
           subHeaders: data.subHeaders,
           title: data.title,
@@ -226,7 +226,7 @@ async function renderReport(data, reportType, extension) {
           yearEnd: data.yearEnd
         }
       });
-
+      console.log(cur + "src/reportsTemplete/local-assets/logo.png");
       if (extension === "pdf") {
         fs.writeFileSync(path.join(CWD, `report.${extension}`), resp.content);
         const pdfWindow = new BrowserWindow({
