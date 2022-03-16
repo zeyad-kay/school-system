@@ -52,13 +52,11 @@
       tableHeader += `</tr>`;
       thead.innerHTML = tableHeader;
       let tableData = "";
-      let count = 0;
       data["rows"].forEach((row) => {
         tableData += `<tr>`;
         row.forEach((el) => {
           tableData += `<td>${el}</td>`;
         });
-        count++;
         tableData += `</tr>`;
       });
       tbody.innerHTML = tableData;
