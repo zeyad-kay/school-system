@@ -9,7 +9,8 @@ const {
   siblings,
   motherData,
   classList,
-  jobReport
+  jobReport,
+  idReport
 } = require("./affairs");
 
 const {
@@ -92,6 +93,11 @@ const Reports = {
       query : jobReport,
       headers:["اسم الطالب" , "الصف","الفصل","وظيفة ولي الأمر","وصف الوظيفة"],
       title:"بيانات على حسب نوع وظيفة ولي الأمر"
+    },
+    idReport : {
+      query : idReport,
+      headers : ["اسم الطالب","الرقم القومي للطالب","الرقم القومي لولي الأمر","الرقم القومي للأب","الرقم القومي للأم"],
+      title : "الرقم القومي للطلاب"
     }
   },
   Expanses: {

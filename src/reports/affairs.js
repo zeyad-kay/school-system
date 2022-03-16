@@ -513,6 +513,71 @@ const jobReport = async (JobId, stageId, gradeId, classId) => {
     });
   });
 };
+const idReport = async (stageId, gradeId, classId) => {
+  let query = "SELECT \"respMother\".\"StudentName\",\"StudentNationalId\",\"ResponsibleId\",\"fatherId\",\"MotherId\"\
+  From (\
+      SELECT \"resp\".\"StudentName\",\"ResponsibleId\",\"MotherId\",\"resp\".\"StudentNationalId\",\"resp\".\"StudentId\"\
+      from (\
+          SELECT \"StudentName\",\
+            \"ParentNationalId\" AS \"ResponsibleId\",\"StudentNationalId\",\"StudentId\"\
+          FROM \"Student\"\
+            JOIN \"Parent\" ON \"Student\".\"StudentResponsibleId\" = \"Parent\".\"ParentId\"\
+        ) AS \"resp\"\
+        JOIN (\
+          SELECT \"StudentName\",\
+            \"ParentNationalId\" AS \"MotherId\"\
+          FROM \"Student\"\
+            JOIN \"Parent\" ON \"Student\".\"StudentMotherId\" = \"Parent\".\"ParentId\"\
+        ) AS \"mother\" ON \"resp\".\"StudentName\" = \"mother\".\"StudentName\"\
+    ) as \"respMother\"\
+    JOIN (\
+      SELECT \"StudentName\",\
+        \"ParentNationalId\" AS \"fatherId\"\
+      FROM \"Student\"\
+        JOIN \"Parent\" ON \"Student\".\"StudentFatherId\" = \"Parent\".\"ParentId\"\
+    ) AS \"father\" ON \"respMother\".\"StudentName\" = \"father\".\"StudentName\"\
+    JOIN \"StudentClass\" ON \"respMother\".\"StudentId\" = \"StudentClass\".\"StudentId\"\
+    JOIN \"Class\" ON \"StudentClass\".\"ClassId\" = \"Class\".\"ClassId\"\
+    JOIN \"Grade\" ON \"Class\".\"GradeId\" = \"Grade\".\"GradeId\"\
+    JOIN \"Stage\" ON \"Grade\".\"StageId\" = \"Stage\".\"StageId\"";
+  if (classId) {
+    query +=
+      " WHERE \"Stage\".\"StageId\" = " +
+      stageId +
+      " AND \"Grade\".\"GradeId\" = " +
+      gradeId +
+      " AND \"Class\".\"ClassId\" = " +
+      classId;
+  } else if (gradeId) {
+    query +=
+      " WHERE \"Stage\".\"StageId\" = " +
+      stageId +
+      " AND \"Grade\".\"GradeId\" = " +
+      gradeId;
+  } else if (stageId) {
+    query += " WHERE \"Stage\".\"StageId\" = '" + stageId + "'";
+  }
+  query += " ORDER BY \"respMother\".\"StudentName\"";
+  return db.sequelize.query(query).then((students) => {
+    for (let i = 0; i < students[0].length; i++) {
+      let keys = Object.keys(students[0][i]);
+      for (const key in keys) {
+        if (!students[0][i][keys[key]]) {
+          students[0][i][keys[key]] = "-------";
+        }
+      }
+    }
+    return students[0].map((student) => {
+      return [
+        student["StudentName"],
+        student["StudentNationalId"],
+        student["ResponsibleId"],
+        student["fatherId"],
+        student["MotherId"]
+      ];
+    });
+  });
+}
 const absenceSummary = async (
   startingDate,
   endingDate,
@@ -558,17 +623,17 @@ const absenceSummary = async (
     " GROUP BY \"StudentName\", \"Stage\".\"StageId\", \"Grade\".\"GradeId\", \"Class\".\"ClassId\", \"ParentPhoneNumber\"\
   HAVING COUNT(\"StudentAbsent\".\"AbsentDate\") ";
   switch (inequality) {
-  case ">=":
-    query += ">=";
-    break;
-  case "<=":
-    query += "<=";
-    break;
-  case "=":
-    query += "=";
-    break;
-  default:
-    query += ">=";
+    case ">=":
+      query += ">=";
+      break;
+    case "<=":
+      query += "<=";
+      break;
+    case "=":
+      query += "=";
+      break;
+    default:
+      query += ">=";
   }
   query += " " +
     minDays +
@@ -758,30 +823,30 @@ const studentsAges = async (stageId, gradeId, classId) => {
       if (student["age"]["months"]) {
         age += " و ";
         switch (student["age"]["months"]) {
-        case 1:
-          age += "شهر";
-          break;
-        case 2:
-          age += "شهرين";
-          break;
-        case 11:
-          age += "11 شهر";
-          break;
-        default:
-          age += student["age"]["months"] + " أشهر";
+          case 1:
+            age += "شهر";
+            break;
+          case 2:
+            age += "شهرين";
+            break;
+          case 11:
+            age += "11 شهر";
+            break;
+          default:
+            age += student["age"]["months"] + " أشهر";
         }
       }
       if (student["age"]["days"]) {
         age += " و ";
         switch (student["age"]["days"]) {
-        case 1:
-          age += "يوم";
-          break;
-        case 2:
-          age += "يومين";
-          break;
-        default:
-          student["age"]["days"] < 11 ? age += " " + student["age"]["days"] + " أيام" : age += " " + student["age"]["days"] + " يوم";
+          case 1:
+            age += "يوم";
+            break;
+          case 2:
+            age += "يومين";
+            break;
+          default:
+            student["age"]["days"] < 11 ? age += " " + student["age"]["days"] + " أيام" : age += " " + student["age"]["days"] + " يوم";
         }
       }
       return [
@@ -812,5 +877,6 @@ module.exports = {
   classList,
   motherData,
   studentsAges,
-  jobReport
+  jobReport,
+  idReport
 };
