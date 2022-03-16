@@ -207,7 +207,16 @@
                 </li>
               </ul>
         </div>
-        <div class="mx-5 nav">
+        <div class="mx-6 nav">
+          <button class="
+                btn btn-warning
+                mx-md-3 mx-4
+                my-2
+                d-inline-block
+                rounded-pill
+              " onclick='window.api.send("getEssentialData", "stagesReport")'>
+            تقارير على مستوى المراحل
+          </button>
           <button class="
                 btn btn-warning
                 mx-md-3 mx-4
@@ -254,13 +263,13 @@
 
   <!--start of side bar-->
   <aside>
-    <div class="offcanvas offcanvas-start container sidebar-nav me-auto" data-bs-scroll="true" data-bs-backdrop="false"
+    <div class="offcanvas offcanvas-start container sidebar-nav me-auto" style="padding: 0px 5px;" data-bs-scroll="true" data-bs-backdrop="false"
       tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
       <div class="offcanvas-header justify-content-center">
         <button type="button" class="btn-close btn-close-white d-md-none me-auto text-reset" data-bs-dismiss="offcanvas"
           aria-label="Close"></button>
       </div>
-      <div id="" class="offcanvas-body justify-content-center" dir="rtl">
+      <div id="" class="offcanvas-body justify-content-center" dir="rtl" style="padding: 0px 5px;">
         <ul class="nav nav-pills" id="pills-tab" role="tablist"></ul>
         <div class="tab-content mt-2" id="pills-tabContent"></div>
       </div>
@@ -268,13 +277,12 @@
   </aside>
   <!--end of side bar-->
   <!--register section-->
-  <main class="mt-5 pt-3 tab-content" id="register"></main>
+  <main class="mt-5 pt-3 tab-content" id="register">
+  </main>
   <script>
     window.api.receive("sentEssentialData", (data) => {
       loadSideBar(data.students);
       ReportsNav(data);
-      console.log("Here");
-      console.log(data.stagesData[2]["Grades"]);
     });
     window.api.send("ScriptLoaded");
   </script>

@@ -441,7 +441,6 @@
     });
     window.api.receive("getStudentDataFromMain", data => {
       StudentId = data.StudentId;
-      console.log(data);
       loadSideBar(data.students);
       // hundle first installment
       document.getElementById("FirstInstallmentAmount").innerText = data.financialData.firsInstall.InstallmentAmount;

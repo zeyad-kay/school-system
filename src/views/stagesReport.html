@@ -13,7 +13,7 @@
       href="../../node_modules/bootstrap-icons/font/bootstrap-icons.css"
     />
     <link rel="stylesheet" href="./scss/exams.css" />
-    <title>تقارير الغياب</title>
+    <title>تقارير على مستوى المراحل</title>
   </head>
 
   <body>
@@ -46,35 +46,7 @@
     </nav>
 
     <main class="container mt-5 pt-5" dir="rtl">
-      <h1 class="text-center">تقارير الغياب</h1>
-      <div class="row mt-5">
-        <div class="col-12 col-md-6">
-          <div class="input-group mb-3 mt-3" dir="rtl">
-            <span class="input-group-text" id="basic-addon1"> من </span>
-            <input
-              id="absentFrom"
-              type="date"
-              class="form-control"
-              placeholder="Username"
-              aria-label="Username"
-              aria-describedby="basic-addon1"
-            />
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <div class="input-group mb-3 mt-3" dir="rtl">
-            <span class="input-group-text" id="basic-addon1"> الي </span>
-            <input
-              id="absentTo"
-              type="date"
-              class="form-control"
-              placeholder="Username"
-              aria-label="Username"
-              aria-describedby="basic-addon1"
-            />
-          </div>
-        </div>
-      </div>
+      <h1 class="text-center">تقارير على مستوى المراحل</h1>
       <div class="row my-3" dir="rtl">
         <div class="col-md-4 col-12">
           <select
@@ -111,40 +83,28 @@
       </div>
       <div class="row my-3" dir="rtl">
         <div class="col-md-4 col-12">
-          <div class="input-group input-group mb-2 col-md-6 col-12">
-            <span class="input-group-text" id="inputGroup-sizing">المعيار</span>
-            <select
-              class="form-select"
-              aria-label="Default select example"
-              id="criteria"
-            >
-              <option value=">=" default>أكبر من أو يساوي</option>
-              <option value="<=">أقل من أو يساوي</option>
-              <option value="=">يساوي</option>
-            </select>
-          </div>
+          <select
+            class="form-select"
+            onchange="reportSelectChange()"
+            aria-label="Default select example"
+            id="reportType"
+          >
+            <option value="StudentsAges" selected>اعمار الطلاب</option>
+            <option value="motherData">بيانات الأم</option>
+            <option value="jobReport">بيانات على حسب الوظيفة</option>
+            <option value="idReport">بيانات الرقم القومي للطالب</option>
+          </select>
         </div>
         <div class="col-md-4 col-12">
-          <div class="input-group input-group mb-2 col-md-6 col-12">
-            <span class="input-group-text" id="inputGroup-sizing"
-              >عدد مرات الغياب</span
-            >
-            <input
-              type="number"
-              class="form-control"
-              aria-label="Sizing example input"
-              aria-describedby="inputGroup-sizing-sm"
-              id="absenceNumber"
-            />
-          </div>
+          <select
+            class="form-select"
+            hidden
+            aria-label="Default select example"
+            id="jobsDataSelect"
+          >
+            <!-- <option value="StudentsAges" selected>اعمار الطلاب</option> -->
+          </select>
         </div>
-        <!-- <div class="col-md-4 col-12">
-                <select class="form-select" aria-label="Default select example" id="condition">
-                    <option value="greaterThan">اكبر من او يساوي</option>
-                    <option value="smallerThan">اقل من او يساوي</option>
-                    <option value="equal">يساوي</option>
-                </select>
-            </div> -->
       </div>
       <div class="d-flex" dir="rtl">
         <div class="col-12 my-5 text-center">
@@ -159,42 +119,43 @@
       </div>
     </main>
     <script>
+      function reportSelectChange() {
+        let reportType = document.getElementById("reportType").value;
+        if (reportType === "jobReport") {
+          document.getElementById("jobsDataSelect").hidden = false;
+        } else {
+          document.getElementById("jobsDataSelect").hidden = true;
+        }
+      }
       function getReport() {
-        const fromDate = document.getElementById("absentFrom").value;
-        const toDate = document.getElementById("absentTo").value;
         const StageId = document.getElementById("StageList").value;
         const GradeId = document.getElementById("GradeList").value;
         const ClassId = document.getElementById("ClassList").value;
-        const absenceNumber = document.getElementById("absenceNumber").value;
-        const condition = document.getElementById("condition");
-        const criteria = document.getElementById("criteria").value;
-        let errors = [];
-        if (!fromDate || !toDate) {
-          errors.push("من فضلك ادخل التواريخ");
-        }
-        if (!absenceNumber || absenceNumber <= 0) {
-          errors.push("عدد مرات الغياب يجب ان تكون اكبر من او تساوي ال 0");
-        }
-
-        if (errors.length === 0) {
-          window.api.send("getAbsenceReport", {
-            fromDate,
-            toDate,
-            StageId,
-            GradeId,
-            ClassId,
-            absenceNumber,
-            criteria,
-          });
+        const reportType = document.getElementById("reportType").value;
+        let JobId = document.getElementById("jobsDataSelect").value;
+        console.log(StageId, GradeId, ClassId);
+        if (reportType === "jobReport") {
+          window.api.send("sendAffairsReportData", [
+            "jobReport",
+            [JobId, Number(StageId), Number(GradeId), Number(ClassId)],
+          ]);
         } else {
-          window.api.send("ShowDialogBox", {
-            messages: errors,
-            type: "error",
-            title: "خطأ",
-          });
+          window.api.send("sendAffairsReportData", [
+            reportType,
+            [Number(StageId), Number(GradeId), Number(ClassId)],
+          ]);
         }
       }
-      window.api.receive("sentEssentialData", (stagesData) => {
+      window.api.receive("sentEssentialData", ({ stagesData, jobs }) => {
+        console.log(jobs);
+        //fill jobs
+        let jobsDataSelect = document.getElementById("jobsDataSelect");
+        jobs.forEach((j) => {
+          const option = document.createElement("option");
+          option.value = j.JobId;
+          option.innerText = j.JobName;
+          jobsDataSelect.appendChild(option);
+        });
         // stages
         const StageList = document.getElementById("StageList");
         const GradeList = document.getElementById("GradeList");

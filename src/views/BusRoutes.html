@@ -189,7 +189,6 @@
                 if (finalRoutes.length === 0) {
                     window.api.send("ShowDialogBox", { messages: ['لا يوجد بيانات ليتم حفظها'], type: 'error', title: 'خطأ' });
                 } else {
-                    console.log(finalRoutes);
                     const { goingtoBeUpdated, deletedRoutes, newRoutes } = comparePrevAndCurrData(originalBusRoutes, finalRoutes);
                     window.api.send("updateBusRoutes", { goingtoBeUpdated, deletedRoutes, newRoutes });
                 }

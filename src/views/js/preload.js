@@ -33,7 +33,8 @@ contextBridge.exposeInMainWorld("api", {
       "render-report",
       "getAbsenceReport",
       "printReport",
-      "generateStudentsCards"
+      "generateStudentsCards",
+      "stagesReport"
     ];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, data);
@@ -45,7 +46,8 @@ contextBridge.exposeInMainWorld("api", {
       "sentEssentialData",
       "reload",
       "updateInstallmentTable",
-      "getReportDataFromMain"
+      "getReportDataFromMain",
+      "reload"
     ];
     if (validChannels.includes(channel)) {
       // Deliberately strip event as it includes `sender`
@@ -56,8 +58,7 @@ contextBridge.exposeInMainWorld("api", {
 
 window.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.querySelector("#login");
-  loginBtn.addEventListener("click", () => {
-    console.log("test");
+  loginBtn?.addEventListener("click", () => {
     const password = document.querySelector("#password").value;
     const department = document.querySelector("#dep").value;
     ipcRenderer.send("login", [department, password]);

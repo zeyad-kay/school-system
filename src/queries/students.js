@@ -201,9 +201,7 @@ const addNewStudent = async (
       StudentResponsibleRelation,
     };
     // create student
-    let student = await db["Student"].create(studentData, { transaction: t }).catch(err => {
-      console.log("");
-    });
+    let student = await db["Student"].create(studentData, { transaction: t }).catch(console.log);
     student = student.dataValues;
     let StudentId = student.StudentId;
     // add class info

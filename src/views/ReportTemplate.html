@@ -20,10 +20,11 @@
     </section>
 
     <div class="row mt-5">
-      <button id="excelButton" type="submit" class="col-6 btn btn-success text-center rounded-pill">
+      <button id="excelButton" , onclick="printReport('xlsx')" type="submit"
+        class="col-6 btn btn-success text-center rounded-pill">
         تحويل لملف اكسيل
       </button>
-      <button id="PrintButton" onclick="printReport()" class="col-6 btn btn-success text-center rounded-pill">
+      <button id="PrintButton" onclick="printReport('pdf')" class="col-6 btn btn-success text-center rounded-pill">
         طباعة
       </button>
     </div>
@@ -32,6 +33,10 @@
   <script>
     let GlobalData = {};
     window.api.receive("getReportDataFromMain", (data) => {
+      data["headers"].unshift("م");
+      for (let i = 0; i < data["rows"].length; i++) {
+        data["rows"][i].unshift(i + 1);
+      }
       GlobalData = data;
       const h1 = document.querySelector("h1");
       const table = document.querySelector("table");
@@ -46,7 +51,6 @@
       });
       tableHeader += `</tr>`;
       thead.innerHTML = tableHeader;
-      console.log(tableHeader);
       let tableData = "";
       data["rows"].forEach((row) => {
         tableData += `<tr>`;
@@ -66,29 +70,21 @@
   <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
   <script src="../../node_modules/datatables.net/js/jquery.dataTables.js"></script>
-  <script src="js/lib/jquery.table2excel.min.js"></script>
   <script>
-    function printReport() {
+    function printReport(extension) {
       window.api.send("printReport", {
-        rows: GlobalData["rows"],
-        subHeaders: GlobalData["headers"],
-        title: GlobalData["title"]
+        data: {
+          rows: GlobalData["rows"],
+          subHeaders: GlobalData["headers"],
+          title: GlobalData["title"],
+        },
+        extension,
       });
     }
     $(document).ready(function () {
       $("#mytable").DataTable({
         searching: true,
         ordering: false,
-      });
-    });
-    $("#excelButton").click(function () {
-      console.log("clicked");
-      $("#mytable").table2excel({
-        // exclude CSS class
-        exclude: ".noExl",
-        name: "Student Test",
-        filename: "SomeFile",
-        fileext: ".xls",
       });
     });
   </script>

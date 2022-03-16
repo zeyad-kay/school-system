@@ -26,7 +26,6 @@ const updateDepartment = (depName, currentPassword, EditedPassword) => {
       DepartmentName: depName
     }
   }).then(dep => dep.toJSON()).then(dep => {
-    console.log(dep);
     if (currentPassword === dep["DepartmentPassword"]) {
       return db["Department"].update({DepartmentPassword: EditedPassword}, {
         where: {

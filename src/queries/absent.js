@@ -25,7 +25,7 @@ const addNewAbsenceDay = async (StudentId, AbsentReasonName, AbsentDate) => {
 
   const absenceDays = student.dataValues.StudentAbsents.length;
   const warnings = student.dataValues.StudentWarnings.length;
-  const perWarning = 10;
+  const perWarning = 5;
 
   if (absenceDays - warnings * perWarning >= perWarning - 1) {
     return await db.sequelize.transaction(async (t) => {
@@ -58,13 +58,15 @@ const deleteAbsence = (StudentId, AbsentDate) => {
       where : {
         StudentId,
         WarningDate : AbsentDate
-      }
+      },
+      transaction: t
     }));
     proms.push(db["StudentAbsent"].destroy({
       where : {
         StudentId,
         AbsentDate
-      }
+      },
+      transaction: t
     }));
     return Promise.all(proms);
   });
@@ -74,7 +76,7 @@ const getStudentAbsenceDays = async (StudentId) => {
     where: {
       StudentId
     },
-    order : [['AbsentDate',"DESC"]]
+    order : [["AbsentDate","DESC"]]
   }).then(dates => dates.map(date => date.toJSON()));
 };
 
@@ -94,7 +96,7 @@ const getAllWarnings = async (StudentId) => {
     where: {
       StudentId
     },
-    order : [['WarningDate',"DESC"]]
+    order : [["WarningDate","DESC"]]
   }).then(warnings => warnings.map(warning => warning.toJSON()));
 };
 
@@ -115,7 +117,7 @@ const receiveWarning = (StudentId, WarningDate) => {
       WarningDate
     }
   });
-}
+};
 const deleteWarning = async (StudentId, WarningDate) => {
   return db["StudentWarning"].destroy({
     where: {

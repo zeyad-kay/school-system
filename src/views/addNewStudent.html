@@ -160,13 +160,13 @@
 
   <!--start of side bar-->
   <aside>
-    <div class="offcanvas offcanvas-start container sidebar-nav me-auto" data-bs-scroll="true" data-bs-backdrop="false"
+    <div class="offcanvas offcanvas-start container sidebar-nav me-auto" style="padding: 0px 5px;" data-bs-scroll="true" data-bs-backdrop="false"
       tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
       <div class="offcanvas-header justify-content-center">
         <button type="button" class="btn-close btn-close-white d-md-none me-auto text-reset" data-bs-dismiss="offcanvas"
           aria-label="Close"></button>
       </div>
-      <div class="offcanvas-body justify-content-center" dir="rtl">
+      <div id="" class="offcanvas-body justify-content-center" dir="rtl" style="padding: 0px 5px;">
         <ul class="nav nav-pills" id="pills-tab" role="tablist"></ul>
         <div class="tab-content mt-2" id="pills-tabContent"></div>
       </div>
@@ -237,11 +237,25 @@
       </div>
 
       <div class="row my-3" dir="rtl">
-        <div class="col-12">
+        <div class="col-4">
           <div class="input-group input-group mb-2 col">
             <span class="input-group-text" id="inputGroup-sizing">تاريخ الميلاد:</span>
             <input type="date" class="form-control" aria-label="Sizing example input"
-              aria-describedby="inputGroup-sizing-sm" id="StudentBirthDate" />
+              aria-describedby="inputGroup-sizing-sm" required id="StudentBirthDate" />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="input-group input-group mb-2 col">
+            <span class="input-group-text" id="inputGroup-sizing">محل الميلاد:</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" required id="StudentBirthPlace" />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="input-group input-group mb-2 col">
+            <span class="input-group-text" id="inputGroup-sizing">محافظة الميلاد:</span>
+            <input type="text" class="form-control" aria-label="Sizing example input"
+              aria-describedby="inputGroup-sizing-sm" required id="StudentBirthGovernorate" />
           </div>
         </div>
       </div>
@@ -544,7 +558,7 @@
   function removeDiv(devId) {
     document.getElementById(devId).remove();
   }
-  function addWorkToDiv(divId, JobId = 1, JobAddress = "", addRemove = true) {
+  function addWorkToDiv(divId, JobId = 1, JobAddress = "", JobDesc = "",addRemove = true) {
     let ID = Math.floor(Math.random() * (20000 - 500)) + 500;
     const dadJobArea = document.getElementById(divId);
     const wrapperDiv = document.createElement("div");
@@ -552,7 +566,7 @@
     wrapperDiv.setAttribute("dir", "rtl");
     wrapperDiv.setAttribute("id", "delete-" + String(ID));
     const dadWorkTitle = document.createElement("div");
-    dadWorkTitle.classList.add("col-12", "col-md-4");
+    dadWorkTitle.classList.add("col-12", "col-md-3");
     const dadWorkSelect = document.createElement("select");
     dadWorkSelect.classList.add("form-select");
     dadWorkSelect.setAttribute("aria-label", "Default select example");
@@ -565,8 +579,9 @@
     dadWorkSelect.value = JobId;
     dadWorkTitle.appendChild(dadWorkSelect);
     wrapperDiv.appendChild(dadWorkTitle);
+
     const dadWorkAdress = document.createElement("div");
-    dadWorkAdress.classList.add("col-12", "col-md-4");
+    dadWorkAdress.classList.add("col-12", "col-md-3");
     const dadWorkAdressInner = document.createElement("div");
     dadWorkAdressInner.classList.add(
       "input-group",
@@ -585,8 +600,30 @@
     dadWorkAdressInner.appendChild(dadWorkAdressInnerInput);
     dadWorkAdress.appendChild(dadWorkAdressInner);
     wrapperDiv.appendChild(dadWorkAdress);
+
+    const dadWorkDisc = document.createElement("div");
+    dadWorkDisc.classList.add("col-12", "col-md-3");
+    const dadWorkDiscInner = document.createElement("div");
+    dadWorkDiscInner.classList.add(
+      "input-group",
+      "input-group",
+      "mb-2",
+      "col"
+    );
+    const dadWorkDiscInnerLabel = document.createElement("span");
+    dadWorkDiscInnerLabel.classList.add("input-group-text");
+    dadWorkDiscInnerLabel.innerText = "وصف للعمل :";
+    dadWorkDiscInner.appendChild(dadWorkDiscInnerLabel);
+    const dadWorkDiscInnerInput = document.createElement("input");
+    dadWorkDiscInnerInput.classList.add("form-control");
+    dadWorkDiscInnerInput.setAttribute("type", "text");
+    dadWorkDiscInnerInput.value = JobDesc;
+    dadWorkDiscInner.appendChild(dadWorkDiscInnerInput);
+    dadWorkDisc.appendChild(dadWorkDiscInner);
+    wrapperDiv.appendChild(dadWorkDisc);
+    
     const addButtonDiv = document.createElement("div");
-    addButtonDiv.classList.add("col-12", "col-md-4");
+    addButtonDiv.classList.add("col-12", "col-md-3");
     const addButtonDivButton = document.createElement("button");
     addButtonDivButton.classList.add("btn", "btn-primary");
     addButtonDivButton.setAttribute(
@@ -612,6 +649,7 @@
       wrapperDiv.appendChild(removeButtonDiv);
     }
     dadJobArea.appendChild(wrapperDiv);
+    
   }
   function addNewPhone(devId, phone = "", addRemove = true) {
     let ID = Math.floor(Math.random() * (20000 - 500)) + 500;
@@ -675,9 +713,9 @@
     loadSideBar(data.students);
     ReportsNav(data);
     jobs = data.jobs;
-    addWorkToDiv("DadworkArea", 1, "", false);
-    addWorkToDiv("MomWorkArea", 1, "", false);
-    addWorkToDiv("ResWorkArea", 1, "", false);
+    addWorkToDiv("DadworkArea", 1, "", "",false);
+    addWorkToDiv("MomWorkArea", 1, "", "",false);
+    addWorkToDiv("ResWorkArea", 1, "", "",false);
     addNewPhone("dadphoneArea", "", false);
     addNewPhone("MomPhoneArea", "", false);
     addNewPhone("ResPhoneArea", "", false);
@@ -692,8 +730,6 @@
     const StageList = document.getElementById("StageList");
     const GradeList = document.getElementById("GradeList");
     const ClassList = document.getElementById("ClassList");
-    console.log(data.stagesData);
-    //console.log(StageList);
     data.stagesData2.forEach((stage) => {
       const option = document.createElement("option");
       option.setAttribute("value", stage.StageId);

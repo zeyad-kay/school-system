@@ -27,8 +27,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     ParentJobAddress: {
       type: DataTypes.STRING,
-      allowNull: false
     },
+    ParentJobDescription: {
+      type: DataTypes.STRING,
+    }
   }, {
     sequelize,
     updatedAt: false,

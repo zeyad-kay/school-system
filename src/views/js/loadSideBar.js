@@ -64,7 +64,7 @@ function loadSideBar(students) {
       gradeAccordionItemContent.setAttribute("aria-labelledby", gradeAccordionItemHeaderId);
       gradeAccordionItemContent.setAttribute("data-bs-parent", `accordion-parent-${grade.GradeId}`);
       const gradeAccordionItemInnerContent = document.createElement("div");
-      gradeAccordionItemInnerContent.classList.add("accordion-body", "text-center");
+      // gradeAccordionItemInnerContent.classList.add("accordion-body", "text-center");
       grade.Classes.forEach(clas => {
         const classAccordion = document.createElement("div");
         classAccordion.classList.add("accordion", "accordion-flush");
@@ -88,7 +88,8 @@ function loadSideBar(students) {
         classAccordionItemContent.setAttribute("id", classDataBsTarget);
         classAccordionItemContent.setAttribute("aria-labelledby", classAccordionItemHeaderId);
         const classAccordionItemInnerContent = document.createElement("div");
-        classAccordionItemInnerContent.classList.add("accordion-body", "text-center");
+        // classAccordionItemInnerContent.classList.add("accordion-body", "text-center");
+        classAccordionItemInnerContent.style = "padding : 5px 0px 5px";
         // create list of students
         clas.StudentClasses.forEach(student => {
           const studentsUl = document.createElement("ul");
